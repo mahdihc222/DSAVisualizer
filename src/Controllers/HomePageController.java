@@ -1,9 +1,9 @@
-package hellofx.Controllers;
+package Controllers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import hellofx.Pages.VisualPage;
+import Pages.VisualPage;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;

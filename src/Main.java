@@ -1,6 +1,5 @@
-package hellofx;
 
-import hellofx.Pages.HomePage;
+import Pages.HomePage;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

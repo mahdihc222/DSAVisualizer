@@ -1,6 +1,6 @@
-package hellofx.Pages;
+package Pages;
 
-import hellofx.Controllers.HomePageController;
+import Controllers.HomePageController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

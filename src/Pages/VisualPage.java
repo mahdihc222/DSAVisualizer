@@ -1,4 +1,4 @@
-package hellofx.Pages;
+package Pages;
 
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
