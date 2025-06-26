@@ -30,7 +30,7 @@ public class VisualPage {
     private static VBox rightBox;
     private static boolean isInit = false;
     private static Array tempArr;
-    private static  List<Integer> temp = List.of(1,2,3,4,5);
+    private static  List<Integer> temp = List.of(12,76,43,9);
     private static void initialize(Stage stage){
         isInit = true;
         root = new VBox();
@@ -60,8 +60,13 @@ public class VisualPage {
 
         animationPane = new Pane();
         animationPane.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
-         tempArr = new Array(100,100,temp);
-         animationPane.getChildren().addAll(tempArr.getVisibleArray());
+        tempArr = new Array(100,100,temp);
+        tempArr.insert(90);
+        tempArr.removeLast();
+        tempArr.insert(10);
+        //tempArr.remove(1);
+        animationPane.getChildren().addAll(tempArr.getVisibleArray());
+
 
         codeBox = new TextArea("//Code will be shown here");
         codeBox.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");

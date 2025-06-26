@@ -19,7 +19,7 @@ public class Array {
         startingX = x;
         startingY = y;
         for(Integer curr:ls){
-            Nodes.add(new Node(curr,startingX+25*Nodes.size(),startingY));
+            Nodes.add(new Node(curr,startingX+20*Nodes.size(),startingY,Nodes.size()));
         }
     }
 
@@ -28,8 +28,16 @@ public class Array {
     }
 
     public void insert(int elem){
-        Nodes.add(new Node(elem,startingX+20*Nodes.size(),startingY));
+        Nodes.add(new Node(elem,startingX+20*Nodes.size(),startingY,Nodes.size()));
     }
+
+    public void removeLast(){
+        Nodes.removeLast();
+    }
+
+    // public void remove(int index){
+    //     Nodes.remove(index);
+    // }
 
 }
 

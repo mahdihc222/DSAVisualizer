@@ -11,16 +11,25 @@ import javafx.scene.text.Text;
 public class Node extends Group{
     private Rectangle rect;
     private Text text;
+    private Text index;
 
-    public Node(Integer elem,int nodeX, int nodeY){
+    public Node(int elem,int nodeX, int nodeY, int ind){
         rect = new Rectangle(nodeX, nodeY, 20,20);
-        
-        text = new Text(elem.toString());
+        rect.setFill(Color.WHITE);
+        rect.setStroke(Color.BLACK);
+        text = new Text(String.valueOf(elem));
         text.setFont(Font.font("Arial",12));
         text.setX(rect.getX()+rect.getWidth()/2 - text.getLayoutBounds().getWidth()/2);
-        text.setY(rect.getY()+rect.getHeight()/2 + text.getLayoutBounds().getHeight()/2);
-        text.setFill(Color.WHITE);
-        this.getChildren().addAll(rect,text);
+        text.setY(rect.getY()+rect.getHeight()/2+text.getLayoutBounds().getHeight()/4);
+
+        index = new Text(String.valueOf(ind));
+        index.setX(text.getX());
+        index.setY(rect.getY()+rect.getHeight()+15);
+        index.setFill(Color.GRAY);
+        index.setFont(Font.font("Arial",12));
+
+        this.getChildren().addAll(rect,text,index);
+        
     }
 
     public int getElement(){ return Integer.parseInt(text.getText());}
