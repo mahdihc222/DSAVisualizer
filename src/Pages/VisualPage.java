@@ -1,5 +1,8 @@
 package Pages;
 
+import java.util.List;
+
+import DataStructures.Array;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -26,6 +29,8 @@ public class VisualPage {
     private static TextArea codeBox;
     private static VBox rightBox;
     private static boolean isInit = false;
+    private static Array tempArr;
+    private static  List<Integer> temp = List.of(1,2,3,4,5);
     private static void initialize(Stage stage){
         isInit = true;
         root = new VBox();
@@ -55,6 +60,8 @@ public class VisualPage {
 
         animationPane = new Pane();
         animationPane.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
+         tempArr = new Array(100,100,temp);
+         animationPane.getChildren().addAll(tempArr.getVisibleArray());
 
         codeBox = new TextArea("//Code will be shown here");
         codeBox.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
@@ -74,6 +81,10 @@ public class VisualPage {
         codeBox.prefHeightProperty().bind(root.heightProperty().multiply(0.6));
         animationPane.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.5));
         animationPane.prefHeightProperty().bind(root.heightProperty());
+
+       
+        
+
 
         root.getChildren().add(rootPane);        
     }

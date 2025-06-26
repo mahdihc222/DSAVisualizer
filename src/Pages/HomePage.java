@@ -29,9 +29,11 @@ public class HomePage {
         mainVBox.setPrefWidth(800);
         mainVBox.setSpacing(10);
 
+
         centerBox = new HBox(mainVBox);
         HBox.setMargin(mainVBox, new Insets(40,0,0,0));
         centerBox.setAlignment(Pos.CENTER);
+
 
         
 
@@ -39,7 +41,6 @@ public class HomePage {
         DSHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
         mainVBox.getChildren().add(DSHeading);
         mainVBox.getChildren().addAll(HomePageController.DSButtonsCreator(stage));
-
 
         AlgoHeading = new Label("Algorithms");
         AlgoHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
