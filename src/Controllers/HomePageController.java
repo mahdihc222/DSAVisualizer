@@ -40,7 +40,7 @@ public class HomePageController {
 
     private static void changeScene(Stage stage, String s){
         
-        stage.getScene().setRoot(VisualPage.getView(stage));
+        stage.getScene().setRoot(VisualPage.getView(stage, s));
     }
 
     public static Accordion algoArchionCreate(){

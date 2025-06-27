@@ -3,6 +3,7 @@ package Pages;
 import java.util.List;
 
 import DataStructures.Array;
+import DataStructures.Stack;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -60,19 +61,19 @@ public class VisualPage {
 
         animationPane = new Pane();
         animationPane.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
-        tempArr = new Array(100,100,temp);
-        tempArr.insert(90);
-        tempArr.removeLast();
-        tempArr.insert(10);
+        // tempArr = new Array(100,100,temp);
+        // tempArr.insert(90);
+        // tempArr.removeLast();
+        // tempArr.insert(10);
         //tempArr.remove(1);
-        animationPane.getChildren().addAll(tempArr.getVisibleArray());
+        // animationPane.getChildren().addAll(tempArr.getVisibleArray());
 
-
+            
         codeBox = new TextArea("//Code will be shown here");
         codeBox.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
         codeBox.setFont(Font.font("Consolas",14));
         codeBox.setEditable(false);
-        codeBox.setWrapText(true);
+        // codeBox.setWrapText(true);
         
         
         rightBox = new VBox(codeBox);
@@ -92,13 +93,19 @@ public class VisualPage {
 
 
         root.getChildren().add(rootPane);        
+
     }
 
     private static String getHeading(){
         return "Heading";
     }
-    public static Parent getView(Stage stage){
+    public static Parent getView(Stage stage, String s){
         if(!isInit) initialize(stage);
+        headingLabel.setText(s);
+        if(s.equals("Stack")) {
+            codeBox.setText(Stack.getCode());
+            
+        }
         return root;
     }
 }
