@@ -34,13 +34,13 @@ public class HomePageController {
             "-fx-font-weight: bold;"                 // font weight
         );
 
-        btn.setOnAction(e->changeScene(stage, s));
+        btn.setOnAction(e->changeScene(stage, btn.getText()));
         return btn;
     } 
 
     private static void changeScene(Stage stage, String s){
         
-        stage.getScene().setRoot(VisualPage.getView(stage));
+        stage.getScene().setRoot(VisualPage.getView(stage, s));
     }
 
     public static Accordion algoArchionCreate(){

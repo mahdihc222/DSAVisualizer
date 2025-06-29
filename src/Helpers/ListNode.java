@@ -8,12 +8,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 
-public class Node extends Group{
+public class ListNode extends Group{
     private Rectangle rect;
     private Text text;
     private Text index;
 
-    public Node(int elem,int nodeX, int nodeY, int ind){
+    public ListNode(int elem,int nodeX, int nodeY, int ind){
         rect = new Rectangle(nodeX, nodeY, 20,20);
         rect.setFill(Color.WHITE);
         rect.setStroke(Color.BLACK);
