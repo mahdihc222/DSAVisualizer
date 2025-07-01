@@ -22,6 +22,17 @@ public class Array {
         }
     }
 
+    // public Array(int x, int y, List<Node> ls) {
+    //     startingX = x;
+    //     startingY = y;
+    //     Nodes.addAll(ls);
+    //     for (int i = 0; i < Nodes.size(); i++) {
+    //         Nodes.get(i).setIndex(i);
+    //         Nodes.get(i).setX(startingX + 20 * i);
+    //         Nodes.get(i).setY(startingY);
+    //     }
+    // }
+
     public List<ListNode> getVisibleArray() {
         return Nodes;
     }

@@ -19,8 +19,10 @@ public class HomePage {
     private static Label DSHeading;
     private static Label AlgoHeading;
     private static boolean isInit=false;
+    private static HomePageController controller;
     private static void initialize(Stage stage){
         isInit=true;
+        controller = new HomePageController();
         scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -40,14 +42,14 @@ public class HomePage {
         DSHeading = new Label("Data Structures");
         DSHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
         mainVBox.getChildren().add(DSHeading);
-        mainVBox.getChildren().addAll(HomePageController.DSButtonsCreator(stage));
+        mainVBox.getChildren().addAll(controller.DSButtonsCreator(stage));
 
         AlgoHeading = new Label("Algorithms");
         AlgoHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
         mainVBox.getChildren().add(AlgoHeading);
         VBox.setMargin(AlgoHeading, new Insets(20,0,0,0));
 
-        mainVBox.getChildren().add(HomePageController.algoArchionCreate());
+        mainVBox.getChildren().add(controller.algoArchionCreate());
         scrollPane.setContent(centerBox);
     }
 

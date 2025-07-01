@@ -7,23 +7,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.PauseTransition;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import Helpers.MyNode;
+import Helpers.ItemNode;
+import Pages.VisualPage;
 
-public class Stack {
-    private static List<MyNode> Nodes = new ArrayList<>();
-    private static int startingX = 200, startingY = 200;
-    private static boolean initializedControls;
-    private static List<Node> Controls = new ArrayList<>();
-
-    public static String getCode() {
-
+public class Stack extends DSAbstract<ItemNode> {
+    private List<ItemNode> Nodes = new ArrayList<>();
+    public Stack(){
+        super();
+        startingX=200;
+        startingY = 200;
+        initializeControls();
+        VisualPage.getCodeBox().setText(getCode());
+        VisualPage.getControlBox().getChildren().addAll(Controls);
+        VisualPage.getAnimationPane().getChildren().addAll(Nodes);
+    }
+    @Override
+    public String getCode() {
         try {
             String code = Files.readString(Path.of("src/code/stackHeader.txt"));
             return code;
@@ -32,18 +36,8 @@ public class Stack {
         }
     }
 
-    public static List<MyNode> getAnimationNodes() {
-        return Nodes;
-    }
-
-    public static List<Node> getControlNodes(Pane animationPane) {
-        if (!initializedControls)
-            initializeControls(animationPane);
-        return Controls;
-    }
-
-    private static void initializeControls(Pane animationPane) {
-        initializedControls = true;
+    @Override
+    protected void initializeControls() {
         TextField pushField = new TextField();
         pushField.setPromptText("Enter value");
         Button pushButton = new Button("Push");
@@ -60,30 +54,34 @@ public class Stack {
                     int value = Integer.parseInt(input);
                     addNode(value);
                     pushField.clear();
-                    animationPane.getChildren().setAll(Stack.getAnimationNodes());
+                    VisualPage.getAnimationPane().getChildren().setAll(Nodes);
                 } catch (NumberFormatException ex) {
                     
                 }
             }
         });
 
-        popButton.setOnAction(e -> {
+        popButton.setOnAction(e -> removeLastNode());
+        Controls.add(pushRow);
+        Controls.add(popRow);
+    }
+    @Override
+    protected void addNode(int val) {
+        ItemNode node = new ItemNode(val, startingX, startingY - Nodes.size() * 20);
+        Nodes.add(node);
+        node.flash(Color.LIMEGREEN);
+    }
+
+    @Override
+    protected void removeLastNode(){
+        if(!Nodes.isEmpty()){
             Nodes.getLast().flash(Color.RED);
             PauseTransition pause = new PauseTransition(Duration.seconds(0.6));
             pause.setOnFinished(event -> {
                 Nodes.removeLast();
-                animationPane.getChildren().setAll(Stack.getAnimationNodes());
+                VisualPage.getAnimationPane().getChildren().setAll(Nodes);
             });
             pause.play();
-
-        });
-        Controls.add(pushRow);
-        Controls.add(popRow);
-    }
-
-    private static void addNode(int value) {
-        MyNode node = new MyNode(value, startingX, startingY - Nodes.size() * 20);
-        Nodes.add(node);
-        node.flash(Color.LIMEGREEN);
+        }
     }
 }
