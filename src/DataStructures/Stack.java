@@ -7,17 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.PauseTransition;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import Helpers.MyNode;
-import Pages.VisualPage;
 
 public class Stack {
     private static List<MyNode> Nodes = new ArrayList<>();
@@ -60,13 +57,12 @@ public class Stack {
 
             if (!input.isEmpty()) {
                 try {
-                    int value = Integer.parseInt(input); // or use input as-is for strings
-                    // 👉 Call your push logic here
+                    int value = Integer.parseInt(input);
                     addNode(value);
-                    pushField.clear(); // optionally clear the field after push
+                    pushField.clear();
                     animationPane.getChildren().setAll(Stack.getAnimationNodes());
                 } catch (NumberFormatException ex) {
-                    // Optional: show error on UI
+                    
                 }
             }
         });

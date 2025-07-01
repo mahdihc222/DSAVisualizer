@@ -34,7 +34,7 @@ public class HomePageController {
             "-fx-font-weight: bold;"                 // font weight
         );
 
-        btn.setOnAction(e->changeScene(stage, s));
+        btn.setOnAction(e->changeScene(stage, btn.getText()));
         return btn;
     } 
 

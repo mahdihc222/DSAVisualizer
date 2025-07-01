@@ -55,11 +55,10 @@ public class MyNode extends Group {
     }
 
     public void flash(Color flashColor) {
-        // Suppose your MyNode contains a Rectangle called `box`
-        rect.setFill(flashColor); // or any green color
+        rect.setFill(flashColor);
 
-        PauseTransition pause = new PauseTransition(Duration.seconds(1.0)); // green for 1.5s
-        pause.setOnFinished(e -> rect.setFill(Color.WHITE)); // or your default color
+        PauseTransition pause = new PauseTransition(Duration.seconds(1.0)); // green for 1s
+        pause.setOnFinished(e -> rect.setFill(Color.WHITE));
         pause.play();
     }
 

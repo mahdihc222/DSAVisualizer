@@ -52,6 +52,12 @@ public class VisualPage {
                 "-fx-font-family: 'Arial';" + // font family
                 "-fx-font-size: 12px;");
         backButton.setOnAction(e -> {
+            animationPane.getChildren().clear(); // Clear the animation pane
+            codeBox.setText("//Code will be shown here"); // Reset the code box
+            controlBox.getChildren().clear(); // Clear the control box
+
+            // Action to return to the home page
+
             stage.getScene().setRoot(HomePage.getView(stage));
         });
 
@@ -77,7 +83,7 @@ public class VisualPage {
                 "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
         codeBox.setFont(Font.font("Consolas", 14));
         codeBox.setEditable(false);
-        // codeBox.setWrapText(true);
+        codeBox.setWrapText(true);
 
         rightBox = new VBox(codeBox);
 
