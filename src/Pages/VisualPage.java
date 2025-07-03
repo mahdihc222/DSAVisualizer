@@ -107,6 +107,8 @@ public class VisualPage {
                         "-fx-border-radius: 8;" + // rounded border
                         "-fx-background-radius: 8;" // rounded background corners
         );
+        controlBox.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.49));
+        controlBox.prefHeightProperty().bind(rootPane.heightProperty().multiply(0.35));
 
         AnchorPane.setBottomAnchor(controlBox, 10.0);
         AnchorPane.setRightAnchor(controlBox, 10.0);
