@@ -3,9 +3,11 @@ import javafx.scene.paint.Color;
 import javafx.animation.PauseTransition;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -15,7 +17,7 @@ public class ItemNode extends Group {
     private Shape boundary;
     private Text text;
     private Text index;
-
+    private ItemNode prev=null;
     @SuppressWarnings("unused") //redundant warning, needed later
     private boolean isRectangle = true;
 
@@ -54,19 +56,25 @@ public class ItemNode extends Group {
         this.getChildren().addAll(boundary, text);
     }
 
-    //this constructor is used to construct circular nodes
-    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle){
+    //this constructor is used to construct circular nodes, which always needs prev link(except root)
+    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle, ItemNode prev){
         this.isRectangle = isRectangle;
+        this.prev = prev;
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
-
+        
         text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME,TEXTSIZE));
+        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+
         updateTextPosition();
 
+        if(this.prev!=null){
+            Line connectLine = getConnectingLine();
+            this.getChildren().add(connectLine);
+        }
+
         this.getChildren().addAll(boundary,text);
-        
     }
 
     //this updateTextPosition places text at proper place
@@ -86,14 +94,14 @@ public class ItemNode extends Group {
         return Integer.parseInt(text.getText());
     }
 
-    public int getX(){
-        if(boundary instanceof Circle) return (int)((Circle)boundary).getCenterX();
-        if(boundary instanceof Rectangle) return (int)((Rectangle)boundary).getX();
+    public double getX(){
+        if(boundary instanceof Circle) return ((Circle)boundary).getCenterX();
+        if(boundary instanceof Rectangle) return ((Rectangle)boundary).getX();
         return -1;
     }
-    public int getY(){
-        if(boundary instanceof Circle) return (int)((Circle)boundary).getCenterY();
-        if(boundary instanceof Rectangle) return (int)((Rectangle)boundary).getY();
+    public double getY(){
+        if(boundary instanceof Circle) return ((Circle)boundary).getCenterY();
+        if(boundary instanceof Rectangle) return ((Rectangle)boundary).getY();
         return -1;
     }
 
@@ -142,6 +150,57 @@ public class ItemNode extends Group {
         PauseTransition pause = new PauseTransition(Duration.seconds(1.0)); // green for 1s
         pause.setOnFinished(e -> boundary.setFill(Color.WHITE));
         pause.play();
+    }
+
+    public void flashText(Color flashColor){
+        text.setFill(flashColor);
+        PauseTransition pause = new PauseTransition(Duration.seconds(2.0)); // green for 1s
+        pause.setOnFinished(e -> text.setFill(Color.BLACK));
+        pause.play();
+    }
+
+    public void setTextColor(Color newColor){
+        text.setFill(newColor);
+    }
+    
+    //Returns a Line connecting this node to its previous node.
+
+    private Line getConnectingLine() {
+        if (this.prev == null) return null;
+
+        if (boundary instanceof Circle && prev.boundary instanceof Circle) {
+            // Calculate direction vector
+            double x1 = prev.getX();
+            double y1 = prev.getY();
+            double x2 = getX();
+            double y2 = getY();
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            double r = NODERADIUS;
+
+            if (dist != 0) {
+                double startX = x1 + dx * r / dist;
+                double startY = y1 + dy * r / dist;
+                double endX = x2 - dx * r / dist;
+                double endY = y2 - dy * r / dist;
+                return new Line(startX, startY, endX, endY);
+            } else {
+                return new Line(x1, y1, x2, y2);
+            }
+        } else if (boundary instanceof Rectangle && prev.boundary instanceof Rectangle) {
+            // Connect midpoints of right side of prev to left side of current
+            Rectangle prevRect = (Rectangle) prev.boundary;
+            Rectangle curRect = (Rectangle) boundary;
+            double prevMidY = prevRect.getY() + prevRect.getHeight() / 2;
+            double curMidY = curRect.getY() + curRect.getHeight() / 2;
+            double prevRightX = prevRect.getX() + prevRect.getWidth();
+            double curLeftX = curRect.getX();
+            return new Line(prevRightX, prevMidY, curLeftX, curMidY);
+        } else {
+            // Fallback: connect centers
+            return new Line(prev.getX(), prev.getY(), getX(), getY());
+        }
     }
 
 }
