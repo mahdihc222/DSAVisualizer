@@ -7,7 +7,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-
+//Dont use
 public class ListNode extends Group{
     private Rectangle rect;
     private Text text;

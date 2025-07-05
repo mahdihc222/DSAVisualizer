@@ -13,18 +13,16 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class HomePageController {
-    private static List<Button> DSBtnList = new ArrayList<>();
-    private static List<String> DSList = List.of("Array","Linked List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");
-    private static List<String> AlgoList = List.of("Sorting","Linked Lists","Divide and Conquer","Dynamic Programming","Greedy Algorithm","Graph Algorithms");
-    
-    public static List<Button> DSButtonsCreator(Stage stage){
+    private List<Button> DSBtnList = new ArrayList<>();
+    private List<String> DSList = List.of("Array","Linked List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");
+    private List<String> AlgoList = List.of("Sorting","Linked Lists","Divide and Conquer","Dynamic Programming","Greedy Algorithm","Graph Algorithms");
+    public List<Button> DSButtonsCreator(Stage stage){
         for(String ds: DSList){
             DSBtnList.add(createButton(ds,stage));
-            //DSBtnList.getLast().setOnAction(null);  
         }
         return DSBtnList;
     }
-    private static Button createButton(String s, Stage stage){
+    private Button createButton(String s, Stage stage){
         Button btn = new Button(s);
         btn.setStyle(
             "-fx-background-color: lightblue;" +    // background color
@@ -38,12 +36,11 @@ public class HomePageController {
         return btn;
     } 
 
-    private static void changeScene(Stage stage, String s){
-        
+    private void changeScene(Stage stage, String s){
         stage.getScene().setRoot(VisualPage.getView(stage, s));
     }
 
-    public static Accordion algoArchionCreate(){
+    public Accordion algoArchionCreate(){
         Accordion homeAccordion = new Accordion();
 
         for(String as: AlgoList){
@@ -53,7 +50,7 @@ public class HomePageController {
         return homeAccordion;
     }
 
-    private static TitledPane createAlgoTitleBox(String s){
+    private TitledPane createAlgoTitleBox(String s){
         TitledPane algoPane = new TitledPane();
         algoPane.setText(s);
         algoPane.setFont(Font.font("Arial", FontWeight.BOLD, 18));
@@ -64,7 +61,7 @@ public class HomePageController {
         return algoPane;
     }
 
-    private static Button createAlgoButton(String s){
+    private Button createAlgoButton(String s){
         Button btn = new Button(s);
         return btn;
     } 

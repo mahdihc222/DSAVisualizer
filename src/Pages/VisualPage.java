@@ -1,9 +1,8 @@
 package Pages;
 
-import java.util.List;
-
-import DataStructures.Array;
-import DataStructures.Stack;
+import DataStructures.DSAbstract;
+import DataStructures.*;
+import Helpers.ItemNode;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -34,8 +33,9 @@ public class VisualPage {
     private static TextArea codeBox;
     private static VBox rightBox;
     private static boolean isInit = false;
-    private static Array tempArr;
-    private static List<Integer> temp = List.of(12, 76, 43, 9);
+    // private static List<Integer> temp = List.of(12, 76, 43, 9);
+    @SuppressWarnings("unused")
+    private static DSAbstract<ItemNode> ds;
 
     private static void initialize(Stage stage) {
         isInit = true;
@@ -43,7 +43,7 @@ public class VisualPage {
         rootPane = new BorderPane();
         VBox.setMargin(rootPane, new Insets(15));
 
-        headingLabel = new Label(getHeading());
+        headingLabel = new Label("//Heading");
         headingLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
         backButton = new Button("Return");
@@ -120,21 +120,32 @@ public class VisualPage {
 
     }
 
-    private static String getHeading() {
-        return "Heading";
-    }
-
     public static Parent getView(Stage stage, String s) {
         if (!isInit)
             initialize(stage);
         headingLabel.setText(s);
 
         if (s.equals("Stack")) {
-            codeBox.setText(Stack.getCode());
-            animationPane.getChildren().setAll(Stack.getAnimationNodes());
-            controlBox.getChildren().setAll(Stack.getControlNodes(animationPane));
+            ds = new Stack();
+        }
+        else if(s.equals("Heap")){
+            ds = new Heap();
+        }
+        else if(s.equals("Binary Search Tree (BST)")){
+            ds = new BST();
         }
 
         return root;
     }
+
+    public static Pane getAnimationPane(){ return animationPane;}
+
+    public static VBox getControlBox() {
+        return controlBox;
+    }
+
+    public static TextArea getCodeBox() {
+        return codeBox;
+    }
+    
 }
