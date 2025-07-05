@@ -1,8 +1,7 @@
 package Pages;
 
 import DataStructures.DSAbstract;
-import DataStructures.Heap;
-import DataStructures.Stack;
+import DataStructures.*;
 import Helpers.ItemNode;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -129,6 +128,9 @@ public class VisualPage {
         }
         else if(s.equals("Heap")){
             ds = new Heap();
+        }
+        else if(s.equals("Binary Search Tree (BST)")){
+            ds = new BST();
         }
 
         return root;

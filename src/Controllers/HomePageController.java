@@ -16,11 +16,9 @@ public class HomePageController {
     private List<Button> DSBtnList = new ArrayList<>();
     private List<String> DSList = List.of("Array","Linked List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");
     private List<String> AlgoList = List.of("Sorting","Linked Lists","Divide and Conquer","Dynamic Programming","Greedy Algorithm","Graph Algorithms");
-    //VisualPage vis;
     public List<Button> DSButtonsCreator(Stage stage){
         for(String ds: DSList){
             DSBtnList.add(createButton(ds,stage));
-            //DSBtnList.getLast().setOnAction(null);  
         }
         return DSBtnList;
     }
