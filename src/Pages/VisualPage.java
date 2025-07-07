@@ -1,6 +1,5 @@
 package Pages;
 
-import DataStructures.DSAbstract;
 import DataStructures.*;
 import Helpers.ItemNode;
 import javafx.geometry.Insets;
@@ -133,6 +132,9 @@ public class VisualPage {
         }
         else if(s.equals("Binary Search Tree (BST)")){
             ds = new BST();
+        }
+        else if(s.equals("Graph")) {
+            ds = new Graph();
         }
 
         return root;

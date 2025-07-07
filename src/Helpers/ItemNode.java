@@ -77,6 +77,25 @@ public class ItemNode extends Group {
         this.getChildren().addAll(boundary,text);
     }
 
+    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle){
+        this.isRectangle = isRectangle;
+        boundary = new Circle(centerX, centerY, NODERADIUS);
+        boundary.setFill(Color.WHITE);
+        boundary.setStroke(Color.BLACK);
+        
+        text = new Text(String.valueOf(elem));
+        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+
+        updateTextPosition();
+
+        if(this.prev!=null){
+            Line connectLine = getConnectingLine();
+            this.getChildren().add(connectLine);
+        }
+
+        this.getChildren().addAll(boundary,text);
+    }
+
     //this updateTextPosition places text at proper place
     private void updateTextPosition(){
         if(boundary instanceof Circle){
