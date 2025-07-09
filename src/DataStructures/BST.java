@@ -1,9 +1,6 @@
 package DataStructures;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.animation.KeyFrame;
@@ -36,16 +33,13 @@ public class BST extends DSAbstract<ItemNode>{
     }
 
     TreeNode root;
-    private int currentX, currentY; //current inserting position in animPane
-    //private Integer index = 1;
-    private int distance = 140;
     private HashMap<TreeNode,ItemNode> map = new HashMap<>();
-    
+    private final int HSPACINGBETWEENNODES = 200;
 
     public BST() {
         super();
-        currentX = startingX = 250;
-        currentY = startingY = 100;
+        startingX = 300;
+        startingY = 100;
         root = null;
         initializeControls();
         VisualPage.getCodeBox().setText(getCode());
@@ -66,9 +60,9 @@ public class BST extends DSAbstract<ItemNode>{
         HBox pushRow = new HBox(10, pushField, pushButton);
 
         TextField removeField = new TextField();
-        pushField.setPromptText("Enter value");
+        removeField.setPromptText("Enter value");
         Button removeButton = new Button("Remove");
-        HBox popRow = new HBox(10, pushField, pushButton);
+        HBox popRow = new HBox(10, removeField, removeButton);
 
         VBox pushPopBox = new VBox();
         pushPopBox.getChildren().addAll(pushRow,popRow);
@@ -78,7 +72,7 @@ public class BST extends DSAbstract<ItemNode>{
             if (e.getCode() == KeyCode.ENTER)
                 insertValue(pushField);
         });
-        removeButton.setOnAction(e -> removeNode());
+        removeButton.setOnAction(e -> removeNode(removeField));
         Controls.add(pushPopBox);
     }
 
@@ -95,43 +89,63 @@ public class BST extends DSAbstract<ItemNode>{
         }
     }
 
-    private void removeNode(){
-
+    private void removeNode(TextField popField){
+        
     }
 
     private TreeNode findParentNodeForInsertion(TreeNode curr, int val){
         if(curr.left==null && curr.right == null) return curr;
-            if(curr.element>val) return findParentNodeForInsertion(curr.left, val);
-            else  return findParentNodeForInsertion(curr.right, val);
+            if(curr.element>val){
+                if(curr.left==null) return curr;
+                return findParentNodeForInsertion(curr.left, val);
+            } 
+            else{
+                if(curr.right == null) return curr;
+                return findParentNodeForInsertion(curr.right, val);
+            }  
+    }
+
+    private int getLevelOfParent(TreeNode curr, int val){
+        if(curr.left==null && curr.right == null) return 1;
+            if(curr.element>val){
+                if(curr.left==null) return 1;
+                return getLevelOfParent(curr.left, val)+1;
+            } 
+            else{
+                if(curr.right == null) return 1;
+                return 1+getLevelOfParent(curr.right, val);
+            }  
     }
 
     @Override
     protected void addNode(int val) {
-
+        TreeNode newNode = new TreeNode(val,null,null);
         if(root==null){
-            root = new TreeNode(val,null, null);
+            root = newNode;
             ItemNode rootItem = new ItemNode(val, startingX, startingY,false,null);
             map.put(root,rootItem);
             dataNodes.add(rootItem);
         }
         else{
             TreeNode parent = findParentNodeForInsertion(root, val);
-            TreeNode newNode = new TreeNode(val,null, null);
+            int level = getLevelOfParent(root, val);
+            double offset = (HSPACINGBETWEENNODES*Math.pow(0.6, level));
             double x = map.get(parent).getX();
-            double y = map.get(parent).getY()+40;
+            double y = map.get(parent).getY()+80;
             if(parent.element>val){
                 parent.left = newNode;
-                x-=distance;
+                x-=offset;
             }
             else{
                 parent.right = newNode;
-                x+=distance;
+                x+=offset;
             }
             ItemNode newItem = new ItemNode(val,(int) x,(int) y,false,map.get(parent));
             dataNodes.add(newItem);
             map.put(newNode, newItem);
         }
         VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
+        map.get(newNode).flash(Color.CADETBLUE);
 
     }
     /*

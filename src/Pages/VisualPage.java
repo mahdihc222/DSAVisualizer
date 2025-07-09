@@ -136,6 +136,9 @@ public class VisualPage {
         else if(s.equals("Graph")) {
             ds = new Graph();
         }
+        else if(s.equals("List")){
+            ds = new MyList();
+        }
 
         return root;
     }

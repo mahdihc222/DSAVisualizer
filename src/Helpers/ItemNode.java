@@ -19,27 +19,27 @@ import javafx.util.Duration;
 public class ItemNode extends Group {
     private Shape boundary;
     private Text text;
-    private Text index;
+    private Text index=null;
     private ItemNode prev=null;
     @SuppressWarnings("unused") //redundant warning, needed later
     private boolean isRectangle = true;
 
-    private final int NODEHEIGHT = 20;
-    private final int NODEWIDTH = 20;
+    private final int NODEHEIGHT = 40;
+    private final int NODEWIDTH = 40;
     private final int NODERADIUS = 20;
     private final int TEXTSIZE=12; //final int to hold textsize
     private final String FONTNAME = "Arial"; //final string to hold fontname
     //constructor to create rectangular nodes with index
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
-        boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
+        boundary = new Rectangle(nodeX, nodeY, NODEHEIGHT, NODEWIDTH);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
         text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME, TEXTSIZE));
+        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
         updateTextPosition();
 
         index = new Text(String.valueOf(ind));
-        index.setX(text.getX());
+        index.setX(nodeX+boundary.getLayoutBounds().getWidth()/2-index.getLayoutBounds().getWidth());
         index.setY(getY() + NODEHEIGHT + 15);
         index.setFill(Color.GRAY);
         index.setFont(Font.font(FONTNAME, TEXTSIZE));
@@ -109,7 +109,13 @@ public class ItemNode extends Group {
             text.setX(getX() + NODEWIDTH / 2 - text.getLayoutBounds().getWidth() / 2);
             text.setY(getY() + NODEHEIGHT / 2 + text.getLayoutBounds().getHeight() / 4);
         }
-        
+    }
+
+    private void updateIndexPosition(){
+        if(index!=null){
+            index.setX(((Rectangle)boundary).getX()+boundary.getLayoutBounds().getWidth()/2-index.getLayoutBounds().getWidth());
+            index.setY(getY() + NODEHEIGHT + 15);
+        }
     }
 
     public int getElement() {
@@ -135,7 +141,7 @@ public class ItemNode extends Group {
 
     //function to set or change the location of a node
     //not tested yet
-    public void setLocation(int x, int y){
+    public void setLocation(double x, double y){
         if(boundary instanceof Circle){
             Circle boun = (Circle) boundary;
             boun.setCenterX(x);
@@ -148,6 +154,7 @@ public class ItemNode extends Group {
             boun.setY(y);
         }
         updateTextPosition();
+        updateIndexPosition();
     }
 
     //function to exchange only value of two nodes
@@ -160,11 +167,9 @@ public class ItemNode extends Group {
         other.updateTextPosition();
     }
 
-    //function to set value of a node to x
-    // public void setElement(Integer x) {
-    //     text.setText(x.toString());
-
-    // }
+    public void setIndex(int ind){
+        index.setText(String.valueOf(ind));
+    }
 
     public void flash(Color flashColor) {
         boundary.setFill(flashColor);

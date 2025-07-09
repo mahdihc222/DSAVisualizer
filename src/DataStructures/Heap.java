@@ -87,6 +87,9 @@ public class Heap extends DSAbstract<ItemNode> {
                 dataNodes.clear();
                 VisualPage.getAnimationPane().getChildren().clear();
                 index=1;
+                currentX = startingX;
+                currentY = startingY;
+                distance = 140;
             }
         });
         VBox selectionBox = new VBox();

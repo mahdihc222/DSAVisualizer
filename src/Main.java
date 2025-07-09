@@ -15,7 +15,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("DSA Visualizer");
-        Scene scene = new Scene(HomePage.getView(primaryStage),1000,600);
+        //primaryStage.setFullScreen(true);
+        primaryStage.setMaximized(true);
+        Scene scene = new Scene(HomePage.getView(primaryStage));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
