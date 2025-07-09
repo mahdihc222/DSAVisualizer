@@ -1,5 +1,8 @@
 package Helpers;
 import javafx.scene.paint.Color;
+
+import java.util.Objects;
+
 import javafx.animation.PauseTransition;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
@@ -220,6 +223,24 @@ public class ItemNode extends Group {
             // Fallback: connect centers
             return new Line(prev.getX(), prev.getY(), getX(), getY());
         }
+    }
+
+    public int getNodeRadius() {
+        return NODERADIUS;
+    }
+
+    public boolean equals(Object other) {
+        if(this == other) return true;
+        if(other == null || getClass() != other.getClass()) return false;
+
+        int x = Integer.parseInt(text.getText());
+        int y = Integer.parseInt(((ItemNode)other).text.getText());
+        return x == y;
+    }
+
+    public int hashCode() {
+        int x = Integer.parseInt(text.getText());
+        return Objects.hash(x);
     }
 
 }
