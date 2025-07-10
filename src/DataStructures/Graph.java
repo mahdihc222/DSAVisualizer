@@ -3,6 +3,7 @@ package DataStructures;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import Helpers.ItemNode;
 import Helpers.Edge;
@@ -24,6 +25,7 @@ import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -154,44 +156,7 @@ public class Graph extends DSAbstract<ItemNode> {
                     dfsField.clear();    
                     vis.clear();
                      
-                    List<ItemNode> dfsOrder = new ArrayList<>();
-                    getDfsOrder(node, dfsOrder);
-                    List<ItemNode> isGry = new ArrayList<>();
-                    Timeline timeline = new Timeline();
-
-
-
-                    for(int i = 0; i < dfsOrder.size(); ++i){
-                        ItemNode n = dfsOrder.get(i);
-
-                        if(!isGry.contains(n)) {
-                            KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
-                                n.setNodeColor(Color.GREY);
-
-                            });
-                            timeline.getKeyFrames().add(frame);
-                            isGry.add(n);
-
-                            
-                        }
-                        else{
-                            KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
-                                n.setNodeColor(Color.BLACK);
-                                n.setTextColor(Color.WHITE);
-
-                            });
-                            timeline.getKeyFrames().add(frame);
-                        }
-
-                    }
-                    KeyFrame frame = new KeyFrame(Duration.seconds(dfsOrder.size() * 1.5), ev -> {
-                                for(ItemNode nod : dataNodes) {
-                                    nod.setNodeColor(Color.WHITE);
-                                    nod.setTextColor(Color.BLACK);
-                                }
-                            });
-                            timeline.getKeyFrames().add(frame);
-                    timeline.play();
+                    animateDFS(node);
 
                 } catch (NumberFormatException ex) {
                     return;
@@ -201,8 +166,117 @@ public class Graph extends DSAbstract<ItemNode> {
         });
 
         Controls.add(dfsBox);
+
+        TextField bfsField = new TextField();
+        bfsField.setPromptText("Starting node:");
+        Button startBFSbutton = new Button("Start BFS");
+        HBox bfsBox = new HBox(10);
+        VBox.setMargin(bfsBox, new Insets(15, 0, 0, 0));
+        bfsBox.getChildren().addAll(bfsField, startBFSbutton);
+        startBFSbutton.setOnAction(e->{
+            String input = bfsField.getText().trim();
+            if (!input.isEmpty()) {
+                try {
+                    int value = Integer.parseInt(input);
+                    ItemNode node = new  ItemNode(value, 0, 0, false);
+                    if(!dataNodes.contains(node)) return;
+                    for(ItemNode el : dataNodes) if(el.equals(node)) node = el;
+                    
+                    bfsField.clear();    
+                    vis.clear();
+                     
+                    animateBFS(node);
+
+                } catch (NumberFormatException ex) {
+                    return;
+                }
+            }
+        });
+        Controls.add(bfsBox);
+        
     }
 
+    private void animateDFS(ItemNode node) {
+        List<ItemNode> dfsOrder = new ArrayList<>();
+        getDfsOrder(node, dfsOrder);
+        List<ItemNode> isGry = new ArrayList<>();
+        Timeline timeline = new Timeline();
+
+
+
+        for(int i = 0; i < dfsOrder.size(); ++i){
+            ItemNode n = dfsOrder.get(i);
+
+            if(!isGry.contains(n)) {
+                KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                    n.setNodeColor(Color.GREY);
+
+                });
+                timeline.getKeyFrames().add(frame);
+                isGry.add(n);
+
+                
+            }
+            else{
+                KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                    n.setNodeColor(Color.BLACK);
+                    n.setTextColor(Color.WHITE);
+
+                });
+                timeline.getKeyFrames().add(frame);
+            }
+
+        }
+        KeyFrame frame = new KeyFrame(Duration.seconds(dfsOrder.size() * 1.5), ev -> {
+                    for(ItemNode nod : dataNodes) {
+                        nod.setNodeColor(Color.WHITE);
+                        nod.setTextColor(Color.BLACK);
+                    }
+                });
+                timeline.getKeyFrames().add(frame);
+        timeline.play();
+    }
+
+    private void animateBFS(ItemNode node) {
+        List<ItemNode> bfsOrder = new ArrayList<>();
+        getBfsOrder(node, bfsOrder);
+        List<ItemNode> isGry = new ArrayList<>();
+        Timeline timeline = new Timeline();
+
+
+
+        for(int i = 0; i < bfsOrder.size(); ++i){
+            ItemNode n = bfsOrder.get(i);
+
+            if(!isGry.contains(n)) {
+                KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                    n.setNodeColor(Color.GREY);
+
+                });
+                timeline.getKeyFrames().add(frame);
+                isGry.add(n);
+
+                
+            }
+            else{
+                KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                    n.setNodeColor(Color.BLACK);
+                    n.setTextColor(Color.WHITE);
+
+                });
+                timeline.getKeyFrames().add(frame);
+            }
+
+        }
+        KeyFrame frame = new KeyFrame(Duration.seconds(bfsOrder.size() * 1.5), ev -> {
+                    for(ItemNode nod : dataNodes) {
+                        nod.setNodeColor(Color.WHITE);
+                        nod.setTextColor(Color.BLACK);
+                    }
+                });
+                timeline.getKeyFrames().add(frame);
+        timeline.play();
+    }
 
 
     void addGraphNode(TextField nodeField) {
@@ -379,17 +453,37 @@ public class Graph extends DSAbstract<ItemNode> {
     }
 
 
-void getDfsOrder(ItemNode node, List<ItemNode> dfsOrder) {
-    dfsOrder.add(node);
-    vis.put(node, true);
-    for(ItemNode e : adj.get(node)){
-        if(vis.containsKey(e)) continue;
-        getDfsOrder(e, dfsOrder);
+    void getDfsOrder(ItemNode node, List<ItemNode> dfsOrder) {
+        dfsOrder.add(node);
+        vis.put(node, true);
+        for(ItemNode e : adj.get(node)){
+            if(vis.containsKey(e)) continue;
+            getDfsOrder(e, dfsOrder);
+        }
+        dfsOrder.add(node);
     }
-    dfsOrder.add(node);
-}
 
 
+    private void getBfsOrder(ItemNode node, List<ItemNode> bfsOrder) {
+        // TODO Auto-generated method stub
+        Queue<ItemNode> q = new LinkedList<>();
+        q.add(node);
+        List<ItemNode> vis = new ArrayList<>();
+        vis.add(node);
+        bfsOrder.add(node);
+        while(!q.isEmpty()) {
+            ItemNode cur = q.remove();
+
+            for(ItemNode e : adj.get(cur)) {
+                if(vis.contains(e)) continue;
+                vis.add(e);
+                q.add(e);
+                bfsOrder.add(e);
+            }
+
+            bfsOrder.add(cur);
+        }
+    }
 
 }
 
