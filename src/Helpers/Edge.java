@@ -21,8 +21,9 @@ public class Edge extends Group {
     }
 
     public boolean containsNode(ItemNode n) {
-        if(isDirected) return n == n1;
-        else return n == n1 || n == n2;
+        // if(isDirected) return n == n1;
+        // else 
+        return n == n1 || n == n2;
     }
 
     public ItemNode getn1 (){

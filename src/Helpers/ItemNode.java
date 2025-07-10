@@ -24,9 +24,9 @@ public class ItemNode extends Group {
     @SuppressWarnings("unused") //redundant warning, needed later
     private boolean isRectangle = true;
 
-    private final int NODEHEIGHT = 40;
-    private final int NODEWIDTH = 40;
-    private final int NODERADIUS = 20;
+    static final int NODEHEIGHT = 40;
+    static final int NODEWIDTH = 40;
+    static final int NODERADIUS = 20;
     private final int TEXTSIZE=12; //final int to hold textsize
     private final String FONTNAME = "Arial"; //final string to hold fontname
     //constructor to create rectangular nodes with index
@@ -173,7 +173,6 @@ public class ItemNode extends Group {
 
     public void flash(Color flashColor) {
         boundary.setFill(flashColor);
-
         PauseTransition pause = new PauseTransition(Duration.seconds(1.0)); // green for 1s
         pause.setOnFinished(e -> boundary.setFill(Color.WHITE));
         pause.play();
@@ -234,8 +233,12 @@ public class ItemNode extends Group {
         }
     }
 
-    public int getNodeRadius() {
+    public static int getNodeRadius() {
         return NODERADIUS;
+    }
+
+    public static int getNodeHeight() {
+        return NODEHEIGHT;
     }
 
     public boolean equals(Object other) {

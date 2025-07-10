@@ -125,7 +125,7 @@ public class VisualPage {
         headingLabel.setText(s);
 
         if (s.equals("Stack")) {
-            ds = new Stack();
+            ds = new Stack(200, 200);
         }
         else if(s.equals("Heap")){
             ds = new Heap();

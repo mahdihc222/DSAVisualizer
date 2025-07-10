@@ -1,12 +1,15 @@
 package DataStructures;
 
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import Helpers.ItemNode;
 import Helpers.Edge;
 import Pages.VisualPage;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -22,6 +25,7 @@ import javafx.util.Duration;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.scene.Node;
 
@@ -35,6 +39,8 @@ public class Graph extends DSAbstract<ItemNode> {
     int centerX = 250;
     int centerY = 300;
     int radius = 150;
+
+    HashMap<ItemNode, Boolean> vis = new HashMap<>();
 
     public Graph() {
         selectionGroup = new ToggleGroup();
@@ -142,12 +148,51 @@ public class Graph extends DSAbstract<ItemNode> {
                 try {
                     int value = Integer.parseInt(input);
                     ItemNode node = new  ItemNode(value, 0, 0, false);
-                    // dfs(node);
-                    dfsField.clear();     
-                    // for(ItemNode el : dataNodes) {
-                    //     el.setNodeColor(Color.WHITE);
-                    //     el.setTextColor(Color.BLACK );
-                    // }
+                    if(!dataNodes.contains(node)) return;
+                    for(ItemNode el : dataNodes) if(el.equals(node)) node = el;
+                    
+                    dfsField.clear();    
+                    vis.clear();
+                     
+                    List<ItemNode> dfsOrder = new ArrayList<>();
+                    getDfsOrder(node, dfsOrder);
+                    List<ItemNode> isGry = new ArrayList<>();
+                    Timeline timeline = new Timeline();
+
+
+
+                    for(int i = 0; i < dfsOrder.size(); ++i){
+                        ItemNode n = dfsOrder.get(i);
+
+                        if(!isGry.contains(n)) {
+                            KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                                n.setNodeColor(Color.GREY);
+
+                            });
+                            timeline.getKeyFrames().add(frame);
+                            isGry.add(n);
+
+                            
+                        }
+                        else{
+                            KeyFrame frame = new KeyFrame(Duration.seconds(i * 1.5), ev -> {
+                                n.setNodeColor(Color.BLACK);
+                                n.setTextColor(Color.WHITE);
+
+                            });
+                            timeline.getKeyFrames().add(frame);
+                        }
+
+                    }
+                    KeyFrame frame = new KeyFrame(Duration.seconds(dfsOrder.size() * 1.5), ev -> {
+                                for(ItemNode nod : dataNodes) {
+                                    nod.setNodeColor(Color.WHITE);
+                                    nod.setTextColor(Color.BLACK);
+                                }
+                            });
+                            timeline.getKeyFrames().add(frame);
+                    timeline.play();
+
                 } catch (NumberFormatException ex) {
                     return;
                 }
@@ -186,12 +231,12 @@ public class Graph extends DSAbstract<ItemNode> {
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
             dataNodes.get(i).setLocation((int)x, (int)y);
-        }   
+        }
         for(int i = 0; i < edges.size(); ++i) {
             edges.get(i).redraw();
         }
+        adj.put(newnode, new ArrayList<>());
         refresh();
-
     }
 
 
@@ -212,6 +257,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     private void removeNode(int value) {
         // TODO Auto-generated method stub
+        ItemNode node = new ItemNode(value, 0, 0, false);
         int removeIdx = -1;
         for(int i = 0; i < nodeCount; ++i) {
             if(dataNodes.get(i).getElement() == value) {
@@ -231,6 +277,7 @@ public class Graph extends DSAbstract<ItemNode> {
             }
             dataNodes.remove(removeIdx);
             nodeCount--;
+            adj.get(node).clear();
         }
         refresh();
     }
@@ -270,6 +317,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 return;
             }
         }
+
     }
 
 
@@ -304,9 +352,10 @@ public class Graph extends DSAbstract<ItemNode> {
 
     void addEdge(ItemNode n1, ItemNode n2) { 
         edges.add(new Edge(n1, n2, isDirected));
+        refresh();
+
         adj.get(n1).add(n2);
         if(!isDirected) adj.get(n2).add(n1);
-        refresh();
     }
 
     
@@ -318,8 +367,6 @@ public class Graph extends DSAbstract<ItemNode> {
 
                                           
     void removeEdge(ItemNode n1, ItemNode n2) {
-        adj.get(n1).remove(n2);
-        adj.get(n2).remove(n1);
         for(int i = 0; i < edges.size(); ++i) {
             if(edges.get(i).connects(n1, n2)) {
                 edges.remove(i);
@@ -327,75 +374,22 @@ public class Graph extends DSAbstract<ItemNode> {
             }
         }
         refresh();
+        adj.get(n1).remove(n2);
+        adj.get(n2).remove(n1);
     }
 
-//     void dfs(ItemNode node) {
-//         if(!dataNodes.contains(node)) return;
 
-//         ItemNode n = null;  
-//         for(int i = 0; i < nodeCount; ++i) {
-//             if(dataNodes.get(i).equals(node)) {
-//                 n = dataNodes.get(i); break;
-//             }
-//         }
-//         n.setNodeColor(Color.GREY);
-//         vis.put(n, true);
-//         active.put(n, true);
-
-//         ItemNode finaln = n;
-//         List<ItemNode> unvisitedNeighbors = new ArrayList<>();  
-
-// PauseTransition pause = new PauseTransition(Duration.seconds(2));
-//     pause.setOnFinished(ev -> {
-//         for(int i = 0; i < edges.size(); ++i){
-//             if(edges.get(i).containsNode(finaln)) {
-//                 ItemNode n1 = edges.get(i).getn1();
-//                 ItemNode n2 = edges.get(i).getn2();
-//                 ItemNode other = (n1 == finaln) ? n2 : n1;
-
-//                 if(!vis.get(other)) {
-                    
-                    
-//                         dfs(other);
-                    
-                    
-//                 }
-//             }
-
-//         }
-//     });
-// pause.play();        
-//             // issue : all adj get colored at once
-//     }
+void getDfsOrder(ItemNode node, List<ItemNode> dfsOrder) {
+    dfsOrder.add(node);
+    vis.put(node, true);
+    for(ItemNode e : adj.get(node)){
+        if(vis.containsKey(e)) continue;
+        getDfsOrder(e, dfsOrder);
+    }
+    dfsOrder.add(node);
+}
 
 
-
-// void dfs(ItemNode node) {
-//     Stack<ItemNode> st = new Stack<>();
-//     HashMap<ItemNode, Boolean> vis = new HashMap<>();
-//     HashMap<ItemNode, Boolean> active = new HashMap<>();
-//     st.push(node);
-//     while (!st.empty()) {
-//         ItemNode cur = st.pop();
-//         cur.setNodeColor(Color.GREY);
-//         vis.put(cur, true);
-//         active.put(cur, true);
-
-//         PauseTransition pause = new PauseTransition(Duration.seconds(2));
-
-//         pause.setOnFinished(v -> {
-//             for(ItemNode e : adj.get(cur)){
-//                 if(!vis.get(e)){
-//                     st.push(e);
-//                 }
-//             }
-
-//         });
-//         pause.play();
-
-        
-//     }
-// }
 
 }
 
