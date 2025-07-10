@@ -1,10 +1,13 @@
 package DataStructures;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Helpers.ItemNode;
 import Helpers.Edge;
 import Pages.VisualPage;
+import javafx.animation.PauseTransition;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
@@ -13,12 +16,19 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.util.Duration;
+
 import java.util.List;
+import java.util.Stack;
+
 import javafx.scene.Node;
 
 public class Graph extends DSAbstract<ItemNode> {
     List<Edge> edges = new ArrayList<>();
+    
+    HashMap<ItemNode, List<ItemNode>> adj = new HashMap<>();
     int nodeCount = 0;
     boolean isDirected = false;
     ToggleGroup selectionGroup;
@@ -34,6 +44,7 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
 
+
     public Graph(boolean isDirected) {
         selectionGroup = new ToggleGroup();
         initializeControls();
@@ -42,13 +53,13 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
 
-    
 
     @Override
     public String getCode() {
         // TODO Auto-generated method stub
         return "not implemented yet.";
     }
+
 
     @Override
     protected void initializeControls() {
@@ -70,7 +81,7 @@ public class Graph extends DSAbstract<ItemNode> {
         Button removeEdgeButton = new Button("Remove Edge");
         HBox edgeRow = new HBox(10, edgeNodeField1, edgeNodeField2, addEdgeButton, removeEdgeButton);
 
-        VBox pushPopBox = new VBox();
+        VBox pushPopBox = new VBox(15);
         pushPopBox.getChildren().addAll( nodeRow, edgeRow);
 
         RadioButton isUndirGraphButton = new RadioButton("Undirected graph");
@@ -99,7 +110,7 @@ public class Graph extends DSAbstract<ItemNode> {
             }
         });
 
-        VBox selectionBox = new VBox();
+        VBox selectionBox = new VBox(15);
         selectionBox.getChildren().addAll(isUndirGraphButton, isDirGraphButton);
 
         HBox totalBox = new HBox(50);
@@ -114,9 +125,40 @@ public class Graph extends DSAbstract<ItemNode> {
         removeNodeButton.setOnAction(e -> removeGraphNode(nodeField));
         addEdgeButton.setOnAction(e-> addGraphEdge(edgeNodeField1, edgeNodeField2));
         removeEdgeButton.setOnAction(e->removeGraphEdge(edgeNodeField1, edgeNodeField2));
+
+
+
         Controls.add(totalBox);
+        TextField dfsField = new TextField();
+        dfsField.setPromptText("Starting node:");
+        Button startDFSbutton = new Button("Start DFS");
+        HBox dfsBox = new HBox(10);
+        VBox.setMargin(dfsBox, new Insets(15, 0, 0, 0));
+        dfsBox.getChildren().addAll(dfsField, startDFSbutton);
         
+        startDFSbutton.setOnAction(e->{
+            String input = dfsField.getText().trim();
+            if (!input.isEmpty()) {
+                try {
+                    int value = Integer.parseInt(input);
+                    ItemNode node = new  ItemNode(value, 0, 0, false);
+                    // dfs(node);
+                    dfsField.clear();     
+                    // for(ItemNode el : dataNodes) {
+                    //     el.setNodeColor(Color.WHITE);
+                    //     el.setTextColor(Color.BLACK );
+                    // }
+                } catch (NumberFormatException ex) {
+                    return;
+                }
+            }
+            
+        });
+
+        Controls.add(dfsBox);
     }
+
+
 
     void addGraphNode(TextField nodeField) {
         String input = nodeField.getText().trim();
@@ -149,6 +191,7 @@ public class Graph extends DSAbstract<ItemNode> {
             edges.get(i).redraw();
         }
         refresh();
+
     }
 
 
@@ -166,6 +209,7 @@ public class Graph extends DSAbstract<ItemNode> {
         }
     }
 
+
     private void removeNode(int value) {
         // TODO Auto-generated method stub
         int removeIdx = -1;
@@ -176,17 +220,28 @@ public class Graph extends DSAbstract<ItemNode> {
             }
         }
         if(removeIdx != -1) {
+            List<Edge> removedEdges = new ArrayList<>();
+            for(int i = 0; i < edges.size(); ++i){
+                if(edges.get(i).containsNode(dataNodes.get(removeIdx))){
+                    removedEdges.add(edges.get(i));
+                }
+            }
+            for(Edge e : removedEdges) {
+                edges.remove(e);
+            }
             dataNodes.remove(removeIdx);
             nodeCount--;
         }
         refresh();
     }
 
+
     @Override
     protected void removeLastNode() {
         // TODO Auto-generated method stub
         
     }
+
 
     void addGraphEdge(TextField t1, TextField t2) {
         String input1 = t1.getText().trim();
@@ -217,6 +272,7 @@ public class Graph extends DSAbstract<ItemNode> {
         }
     }
 
+
     void removeGraphEdge(TextField t1, TextField t2) {
         String input1 = t1.getText().trim();
         String input2 = t2.getText().trim();
@@ -245,23 +301,101 @@ public class Graph extends DSAbstract<ItemNode> {
         refresh();
     }
 
+
     void addEdge(ItemNode n1, ItemNode n2) { 
         edges.add(new Edge(n1, n2, isDirected));
+        adj.get(n1).add(n2);
+        if(!isDirected) adj.get(n2).add(n1);
         refresh();
     }
 
+    
     void refresh() {
         VisualPage.getAnimationPane().getChildren().clear();
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
         VisualPage.getAnimationPane().getChildren().addAll(edges);
     }
 
+                                          
     void removeEdge(ItemNode n1, ItemNode n2) {
+        adj.get(n1).remove(n2);
+        adj.get(n2).remove(n1);
         for(int i = 0; i < edges.size(); ++i) {
             if(edges.get(i).connects(n1, n2)) {
                 edges.remove(i);
                 break;
             }
         }
+        refresh();
     }
+
+//     void dfs(ItemNode node) {
+//         if(!dataNodes.contains(node)) return;
+
+//         ItemNode n = null;  
+//         for(int i = 0; i < nodeCount; ++i) {
+//             if(dataNodes.get(i).equals(node)) {
+//                 n = dataNodes.get(i); break;
+//             }
+//         }
+//         n.setNodeColor(Color.GREY);
+//         vis.put(n, true);
+//         active.put(n, true);
+
+//         ItemNode finaln = n;
+//         List<ItemNode> unvisitedNeighbors = new ArrayList<>();  
+
+// PauseTransition pause = new PauseTransition(Duration.seconds(2));
+//     pause.setOnFinished(ev -> {
+//         for(int i = 0; i < edges.size(); ++i){
+//             if(edges.get(i).containsNode(finaln)) {
+//                 ItemNode n1 = edges.get(i).getn1();
+//                 ItemNode n2 = edges.get(i).getn2();
+//                 ItemNode other = (n1 == finaln) ? n2 : n1;
+
+//                 if(!vis.get(other)) {
+                    
+                    
+//                         dfs(other);
+                    
+                    
+//                 }
+//             }
+
+//         }
+//     });
+// pause.play();        
+//             // issue : all adj get colored at once
+//     }
+
+
+
+// void dfs(ItemNode node) {
+//     Stack<ItemNode> st = new Stack<>();
+//     HashMap<ItemNode, Boolean> vis = new HashMap<>();
+//     HashMap<ItemNode, Boolean> active = new HashMap<>();
+//     st.push(node);
+//     while (!st.empty()) {
+//         ItemNode cur = st.pop();
+//         cur.setNodeColor(Color.GREY);
+//         vis.put(cur, true);
+//         active.put(cur, true);
+
+//         PauseTransition pause = new PauseTransition(Duration.seconds(2));
+
+//         pause.setOnFinished(v -> {
+//             for(ItemNode e : adj.get(cur)){
+//                 if(!vis.get(e)){
+//                     st.push(e);
+//                 }
+//             }
+
+//         });
+//         pause.play();
+
+        
+//     }
+// }
+
 }
+

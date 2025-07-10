@@ -189,6 +189,10 @@ public class ItemNode extends Group {
     public void setTextColor(Color newColor){
         text.setFill(newColor);
     }
+
+    public void setNodeColor(Color color) {
+        boundary.setFill(color);
+    }
     
     //Returns a Line connecting this node to its previous node.
 

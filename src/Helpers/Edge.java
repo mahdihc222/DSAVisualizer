@@ -20,6 +20,19 @@ public class Edge extends Group {
         }   
     }
 
+    public boolean containsNode(ItemNode n) {
+        if(isDirected) return n == n1;
+        else return n == n1 || n == n2;
+    }
+
+    public ItemNode getn1 (){
+        return n1;
+    }
+
+    public ItemNode getn2 (){
+        return n2;
+    }
+
     public boolean connects(ItemNode n1, ItemNode n2) {
         if(isDirected)
         return (this.n1 == n1 && this.n2 == n2);
