@@ -1,5 +1,8 @@
 package Helpers;
 import javafx.scene.paint.Color;
+
+import java.util.Objects;
+
 import javafx.animation.PauseTransition;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
@@ -21,9 +24,9 @@ public class ItemNode extends Group {
     @SuppressWarnings("unused") //redundant warning, needed later
     private boolean isRectangle = true;
 
-    private final int NODEHEIGHT = 40;
-    private final int NODEWIDTH = 40;
-    private final int NODERADIUS = 20;
+    static final int NODEHEIGHT = 40;
+    static final int NODEWIDTH = 40;
+    static final int NODERADIUS = 20;
     private final int TEXTSIZE=12; //final int to hold textsize
     private final String FONTNAME = "Arial"; //final string to hold fontname
     //constructor to create rectangular nodes with index
@@ -60,6 +63,25 @@ public class ItemNode extends Group {
     public ItemNode(int elem,int centerX, int centerY, boolean isRectangle, ItemNode prev){
         this.isRectangle = isRectangle;
         this.prev = prev;
+        boundary = new Circle(centerX, centerY, NODERADIUS);
+        boundary.setFill(Color.WHITE);
+        boundary.setStroke(Color.BLACK);
+        
+        text = new Text(String.valueOf(elem));
+        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+
+        updateTextPosition();
+
+        if(this.prev!=null){
+            Line connectLine = getConnectingLine();
+            this.getChildren().add(connectLine);
+        }
+
+        this.getChildren().addAll(boundary,text);
+    }
+
+    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle){
+        this.isRectangle = isRectangle;
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
@@ -151,7 +173,6 @@ public class ItemNode extends Group {
 
     public void flash(Color flashColor) {
         boundary.setFill(flashColor);
-
         PauseTransition pause = new PauseTransition(Duration.seconds(1.0)); // green for 1s
         pause.setOnFinished(e -> boundary.setFill(Color.WHITE));
         pause.play();
@@ -166,6 +187,10 @@ public class ItemNode extends Group {
 
     public void setTextColor(Color newColor){
         text.setFill(newColor);
+    }
+
+    public void setNodeColor(Color color) {
+        boundary.setFill(color);
     }
     
     //Returns a Line connecting this node to its previous node.
@@ -206,6 +231,28 @@ public class ItemNode extends Group {
             // Fallback: connect centers
             return new Line(prev.getX(), prev.getY(), getX(), getY());
         }
+    }
+
+    public static int getNodeRadius() {
+        return NODERADIUS;
+    }
+
+    public static int getNodeHeight() {
+        return NODEHEIGHT;
+    }
+
+    public boolean equals(Object other) {
+        if(this == other) return true;
+        if(other == null || getClass() != other.getClass()) return false;
+
+        int x = Integer.parseInt(text.getText());
+        int y = Integer.parseInt(((ItemNode)other).text.getText());
+        return x == y;
+    }
+
+    public int hashCode() {
+        int x = Integer.parseInt(text.getText());
+        return Objects.hash(x);
     }
 
 }

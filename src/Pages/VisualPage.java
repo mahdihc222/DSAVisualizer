@@ -106,6 +106,8 @@ public class VisualPage {
                         "-fx-border-radius: 8;" + // rounded border
                         "-fx-background-radius: 8;" // rounded background corners
         );
+        controlBox.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.49));
+        controlBox.prefHeightProperty().bind(rootPane.heightProperty().multiply(0.35));
 
         AnchorPane.setBottomAnchor(controlBox, 10.0);
         AnchorPane.setRightAnchor(controlBox, 10.0);
@@ -123,13 +125,16 @@ public class VisualPage {
         headingLabel.setText(s);
 
         if (s.equals("Stack")) {
-            ds = new Stack();
+            ds = new Stack(200, 200);
         }
         else if(s.equals("Heap")){
             ds = new Heap();
         }
         else if(s.equals("Binary Search Tree (BST)")){
             ds = new BST();
+        }
+        else if(s.equals("Graph")) {
+            ds = new Graph();
         }
         else if(s.equals("List")){
             ds = new MyList();

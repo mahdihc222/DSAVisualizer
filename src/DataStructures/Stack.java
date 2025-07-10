@@ -17,10 +17,10 @@ import Pages.VisualPage;
 
 public class Stack extends DSAbstract<ItemNode> {
     private List<ItemNode> Nodes = new ArrayList<>();
-    public Stack(){
+    public Stack(int startingX, int startingY){
         super();
-        startingX=200;
-        startingY = 200;
+        this.startingX = startingX;
+        this.startingY = startingY;
         initializeControls();
         VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
