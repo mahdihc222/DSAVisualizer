@@ -46,6 +46,7 @@ public class HomePage {
 
         AlgoHeading = new Label("Algorithms");
         AlgoHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
+        mainVBox.getChildren().add(controller.createButton("Sorting",stage));
         mainVBox.getChildren().add(AlgoHeading);
         VBox.setMargin(AlgoHeading, new Insets(20,0,0,0));
 

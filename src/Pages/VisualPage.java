@@ -1,5 +1,6 @@
 package Pages;
 
+import Algorithms.Sorting;
 import DataStructures.*;
 import Helpers.ItemNode;
 import javafx.geometry.Insets;
@@ -152,6 +153,10 @@ public class VisualPage {
             ds = new Graph();
         } else if (s.equals("List")) {
             ds = new MyList();
+        }
+
+        else if(s.equals("Sorting")){
+            new Sorting();
         }
 
         return root;

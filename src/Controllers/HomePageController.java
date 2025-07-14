@@ -22,7 +22,7 @@ public class HomePageController {
         }
         return DSBtnList;
     }
-    private Button createButton(String s, Stage stage){
+    public Button createButton(String s, Stage stage){
         Button btn = new Button(s);
         btn.setStyle(
             "-fx-background-color: lightblue;" +    // background color
