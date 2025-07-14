@@ -2,6 +2,7 @@ package DataStructures;
 
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -27,8 +28,10 @@ import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.scene.Node;
@@ -36,7 +39,9 @@ import javafx.scene.Node;
 public class Graph extends DSAbstract<ItemNode> {
     List<Edge> edges = new ArrayList<>();
 
-    HashMap<ItemNode, List<ItemNode>> adj = new HashMap<>();
+    Map<ItemNode, List<ItemNode>> adj = new TreeMap<>(
+        Comparator.comparingInt(ItemNode::getElement)
+    );
     int nodeCount = 0;
     boolean isDirected = false;
     ToggleGroup selectionGroup;
@@ -302,6 +307,7 @@ public class Graph extends DSAbstract<ItemNode> {
                     if (isGry.contains(n)) {
                         isGry.remove(n);
                         n.setNodeColor(Color.WHITE);
+                        n.setTextColor(Color.BLACK);
                         bfsQueue.removeLast(); queueX -= 40;
                         refresh();
                     } else { // black
@@ -604,6 +610,10 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
         VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
         highlightCurBfsNode();
+    }
+
+    void createAdjacencyLists() {
+        
     }
 
     void removeEdge(ItemNode n1, ItemNode n2) {
