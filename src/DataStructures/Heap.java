@@ -1,7 +1,7 @@
 package DataStructures;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.animation.KeyFrame;
@@ -10,6 +10,7 @@ import javafx.animation.Timeline;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
@@ -32,7 +33,8 @@ public class Heap extends DSAbstract<ItemNode> {
         currentY = startingY = 100;
         selectionGroup = new ToggleGroup();
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        //VisualPage.getCodeBox().setText(getCode());
+        showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
@@ -42,15 +44,24 @@ public class Heap extends DSAbstract<ItemNode> {
         currentX = startingX = 250;
         currentY = startingY = 100;
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
 
     @Override
-    public String getCode() {
-        return "Not implemented yet";
+    protected void showCode() {
+        Tab minHeapTab = new Tab("Min Heap");
+        minHeapTab.setContent(getCodeTextArea("MinHeap"));
+        Tab maxHeapTab = new Tab("Max Heap");
+        maxHeapTab.setContent(getCodeTextArea("MaxHeap"));
+        VisualPage.getCodePane().getTabs().add(minHeapTab);
+        VisualPage.getCodePane().getTabs().add(maxHeapTab);
+
+        
     }
+
+    
 
     @Override
     protected void initializeControls() {
@@ -97,8 +108,6 @@ public class Heap extends DSAbstract<ItemNode> {
 
         HBox totalBox = new HBox(50);
 
-        // Region gap = new Region();
-        // HBox.setHgrow(gap, Priority.ALWAYS);
 
         totalBox.getChildren().addAll(pushPopBox,selectionBox);
 

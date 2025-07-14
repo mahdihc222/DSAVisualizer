@@ -1,0 +1,96 @@
+#include <iostream>
+
+class ArrayStack {
+private:
+    int* data;          // Pointer to dynamically allocated array
+    int capacity;       // Maximum capacity of the stack
+    int current_size;   // Current number of elements in the stack
+
+    // Helper function to resize the array
+    void resize(int new_capacity) {
+        int* newData = new int[new_capacity];
+        if (newData == nullptr) {
+            std::cerr << "Error allocating memory..." << std::endl;
+            exit(-1);
+        }
+        for (int i = 0; i < current_size; i++) {
+            newData[i] = data[i];
+        }
+        delete[] data;
+        capacity = new_capacity;
+        data = newData;
+    }
+
+public:
+    // Constructor
+    ArrayStack(int initial_capacity = 10) {
+        data = new int[initial_capacity];
+        capacity = initial_capacity;
+        current_size = 0;
+    }
+
+    // Destructor
+    ~ArrayStack() {
+        delete[] data;
+    }
+
+    // Push an element onto the stack
+    void push(int item) {
+        if (current_size >= capacity / 2) {
+            resize(capacity * 2);
+        }
+        data[current_size++] = item;
+    }
+
+    // Pop an element from the stack
+    int pop() {
+        if (empty()) {
+            std::cerr << "Stack is empty" << std::endl;
+            return -5678; // error code
+        }
+        current_size--;
+        int poppedData = data[current_size];
+        if (current_size < capacity / 4 && capacity > 2) {
+            resize(capacity / 2);
+        }
+        return poppedData;
+    }
+
+    // Clear the stack
+    void clear() {
+        current_size = 0;
+    }
+
+    // Get the current size of the stack
+    int size() const {
+        return current_size;
+    }
+
+    // Get the top element without removing it
+    int top() const {
+        if (empty()) {
+            std::cerr << "Stack is empty" << std::endl;
+            return -5678; // error code
+        }
+        return data[current_size - 1];
+    }
+
+    // Check if the stack is empty
+    bool empty() const {
+        return current_size == 0;
+    }
+
+    // Print the stack contents
+    void print() const {
+        std::cout << "|";
+        int current = current_size - 1;
+        while (current >= 0) {
+            std::cout << data[current];
+            if (current != 0) {
+                std::cout << ", ";
+            }
+            current--;
+        }
+        std::cout << ">" << std::endl;
+    }
+};

@@ -1,6 +1,5 @@
 package DataStructures;
 
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,27 +8,22 @@ import Helpers.ItemNode;
 import Helpers.Edge;
 import Pages.VisualPage;
 import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import javafx.scene.Node;
 
 public class Graph extends DSAbstract<ItemNode> {
     List<Edge> edges = new ArrayList<>();
@@ -47,7 +41,7 @@ public class Graph extends DSAbstract<ItemNode> {
     public Graph() {
         selectionGroup = new ToggleGroup();
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        //VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
@@ -56,18 +50,18 @@ public class Graph extends DSAbstract<ItemNode> {
     public Graph(boolean isDirected) {
         selectionGroup = new ToggleGroup();
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
     }
 
-
     @Override
-    public String getCode() {
-        // TODO Auto-generated method stub
-        return "not implemented yet.";
-    }
+    protected void showCode(){
+        Tab dfsTab = new Tab("DFS");
+        Tab bfsTab = new Tab("BFS");
 
+        //call getCodeTextArea with appropriate titles
+    }
 
     @Override
     protected void initializeControls() {

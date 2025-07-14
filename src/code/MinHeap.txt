@@ -1,0 +1,63 @@
+#include <vector>
+#include <algorithm>
+#include <climits>
+
+class MinHeap {
+private:
+    std::vector<int> heap;
+
+    void heapifyUp(int index) {
+        while (index > 0) {
+            int parent = (index - 1) / 2;
+            if (heap[index] >= heap[parent])
+                break;
+            std::swap(heap[index], heap[parent]);
+            index = parent;
+        }
+    }
+
+    void heapifyDown(int index) {
+        int n = heap.size();
+        while (true) {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int smallest = index;
+
+            if (left < n && heap[left] < heap[smallest])
+                smallest = left;
+            if (right < n && heap[right] < heap[smallest])
+                smallest = right;
+
+            if (smallest == index)
+                break;
+
+            std::swap(heap[index], heap[smallest]);
+            index = smallest;
+        }
+    }
+
+public:
+    void push(int val) {
+        heap.push_back(val);
+        heapifyUp(heap.size() - 1);
+    }
+
+    int pop() {
+        if (heap.empty())
+            return INT_MAX;
+            
+        int minVal = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapifyDown(0);
+        return minVal;
+    }
+
+    int getMin() {
+        return heap.empty() ? INT_MAX : heap[0];
+    }
+
+    bool isEmpty() {
+        return heap.empty();
+    }
+};

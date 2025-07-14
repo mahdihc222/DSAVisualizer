@@ -1,0 +1,63 @@
+#include <vector>
+#include <algorithm>
+#include <climits>
+
+class MaxHeap {
+private:
+    std::vector<int> heap;
+
+    void heapifyUp(int index) {
+        while (index > 0) {
+            int parent = (index - 1) / 2;
+            if (heap[index] <= heap[parent])
+                break;
+            std::swap(heap[index], heap[parent]);
+            index = parent;
+        }
+    }
+
+    void heapifyDown(int index) {
+        int n = heap.size();
+        while (true) {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int largest = index;
+
+            if (left < n && heap[left] > heap[largest])
+                largest = left;
+            if (right < n && heap[right] > heap[largest])
+                largest = right;
+
+            if (largest == index)
+                break;
+
+            std::swap(heap[index], heap[largest]);
+            index = largest;
+        }
+    }
+
+public:
+    void push(int val) {
+        heap.push_back(val);
+        heapifyUp(heap.size() - 1);
+    }
+
+    int pop() {
+        if (heap.empty())
+            return INT_MIN;
+            
+        int maxVal = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapifyDown(0);
+        return maxVal;
+    }
+
+    int getMax() {
+        return heap.empty() ? INT_MIN : heap[0];
+    }
+
+    bool isEmpty() {
+        return heap.empty();
+    }
+};
