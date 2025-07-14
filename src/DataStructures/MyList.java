@@ -3,7 +3,9 @@ package DataStructures;
 import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -15,17 +17,18 @@ public class MyList extends DSAbstract<ItemNode> {
     private final int NODEWIDTH=40;
     private int currentIndex;
     private int startingX, startingY;
+    private int offsetY;
     private Line currentIndexIndicator;
     private final int INDICATORHEIGHT = 50;
     public MyList(){
         super();
         startingX = currentX = 50;
-        startingY= currentY = 400;
+        startingY= currentY = 100;
         currentIndex = 0;
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        
         VisualPage.getControlBox().getChildren().addAll(Controls);
-        VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        showCode();
         currentIndexIndicator = new Line(currentX,currentY-5,currentX,currentY-5+INDICATORHEIGHT);
         currentIndexIndicator.setStroke(Color.RED);
         currentIndexIndicator.setStrokeWidth(3);
@@ -46,41 +49,62 @@ public class MyList extends DSAbstract<ItemNode> {
         currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()+(NODEWIDTH+10));
     }
 
-    @Override
-    public String getCode() {
-        return "...";
-    }
+    
 
     @Override
     protected void initializeControls() {
         TextField pushField = new TextField();
         pushField.setPromptText("Enter value");
         Button pushButton = new Button("Insert");
+        // standardizeButton(pushButton);
         HBox pushRow = new HBox(20, pushField, pushButton);
         pushButton.setOnAction(e->{
             insert(pushField);
         });
+        pushField.setOnKeyPressed(e->{
+            if(e.getCode()==KeyCode.ENTER){
+                insert(pushField);
+            }
+        });
         TextField removeField = new TextField();
         removeField.setPromptText("Enter value");
         Button removeButton = new Button("Remove");
+        // standardizeButton(removeButton);
         removeButton.setOnAction(e->{
             delete(removeField);
         });
         HBox popRow = new HBox(20, removeField, removeButton);
 
-        VBox pushPopBox = new VBox(20,pushRow,popRow);
+        VBox pushPopBox = new VBox(40,pushRow,popRow);
 
         Button leftArrow = new Button("←"); 
+        // standardizeButton(leftArrow);
         leftArrow.setOnAction(e->moveIndicatorLeft());  // U+2190
         Button rightArrow = new Button("→");  // U+2192
+        // standardizeButton(rightArrow);
         rightArrow.setOnAction(e->moveIndicatorRight());
         HBox arrowBox = new HBox(5, leftArrow,rightArrow);
-        VBox rightSideControlBox = new VBox(20,arrowBox);
+
+        Button bubbleSortButton = new Button("Bubble Sort");
+        Button selectionSortButton = new Button("Selection Sort");
+        Button insertionSortButton = new Button("Insertion Sort");
+        Button mergeSortButton = new Button("Merge Sort");
+        Button quickSortButton = new Button("Quick Sort");
+
+        
+
+        VBox rightSideControlBox = new VBox(10,arrowBox,bubbleSortButton,selectionSortButton,insertionSortButton,mergeSortButton,quickSortButton);
 
         HBox totalBox = new HBox(20,pushPopBox,rightSideControlBox);
 
 
         Controls.add(totalBox);
+    }
+
+    @Override
+    protected void showCode(){
+        Tab arrayListTab = new Tab("Array List");
+        //arrayListTab.setContent(getCodeTextArea("ArrayList"));
     }
 
     private void delete(TextField removeField){
@@ -89,8 +113,8 @@ public class MyList extends DSAbstract<ItemNode> {
         if (!input.isEmpty()) {
             try {
                 int value = Integer.parseInt(input);
-                // addNode(value);
-                removeField.clear();
+                addNode(value);
+                removeField.clear(); 
             } catch (NumberFormatException ex) {
                 return;
             }
@@ -127,7 +151,7 @@ public class MyList extends DSAbstract<ItemNode> {
 
         currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()+NODEWIDTH+10);
         currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()+NODEWIDTH+10);
-        updateVisuals();
+        VisualPage.getAnimationPane().getChildren().add(newNode);
     }
 
     @Override
@@ -143,14 +167,14 @@ public class MyList extends DSAbstract<ItemNode> {
         
             currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()-(NODEWIDTH+10));
             currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()-(NODEWIDTH+10));
-            updateVisuals();
+            VisualPage.getAnimationPane().getChildren().remove(currentIndex);
         }
     }
 
-    private void updateVisuals(){
-        VisualPage.getAnimationPane().getChildren().clear();
-        VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
-        VisualPage.getAnimationPane().getChildren().add(currentIndexIndicator);
-    }
+    // private void updateVisuals(){
+    //    // VisualPage.getAnimationPane().getChildren().clear();
+    //     VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
+    //     VisualPage.getAnimationPane().getChildren().add(currentIndexIndicator);
+    // }
     
 }

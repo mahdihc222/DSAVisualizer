@@ -1,6 +1,5 @@
 package DataStructures;
 
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,12 +10,11 @@ import Helpers.Edge;
 import Pages.VisualPage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
@@ -34,7 +32,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javafx.scene.Node;
 
 public class Graph extends DSAbstract<ItemNode> {
     List<Edge> edges = new ArrayList<>();
@@ -74,7 +71,7 @@ public class Graph extends DSAbstract<ItemNode> {
     public Graph() {
         selectionGroup = new ToggleGroup();
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        //VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
         VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
@@ -94,6 +91,14 @@ public class Graph extends DSAbstract<ItemNode> {
     @Override
     public String getCode() {
         return "not implemented yet.";
+    }
+
+    @Override
+    protected void showCode(){
+        Tab dfsTab = new Tab("DFS");
+        Tab bfsTab = new Tab("BFS");
+
+        //call getCodeTextArea with appropriate titles
     }
 
     @Override

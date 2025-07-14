@@ -1,13 +1,11 @@
 package DataStructures;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -22,18 +20,23 @@ public class Stack extends DSAbstract<ItemNode> {
         this.startingX = startingX;
         this.startingY = startingY;
         initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
+        showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(Nodes);
     }
+    
+
     @Override
-    public String getCode() {
-        try {
-            String code = Files.readString(Path.of("src/code/stackHeader.txt"));
-            return code;
-        } catch (IOException e) {
-            return "Failed to load code.";
-        }
+    protected void showCode(){
+        Tab arrayStackTab = new Tab("Array Stack");
+        arrayStackTab.setContent(getCodeTextArea("ArrayStack"));
+        VisualPage.getCodePane().getTabs().add(arrayStackTab);
+
+        Tab llStackTab = new Tab("Linked List Stack");
+        llStackTab.setContent(getCodeTextArea("ListStack"));
+        VisualPage.getCodePane().getTabs().add(llStackTab);
+
+
     }
 
     @Override
