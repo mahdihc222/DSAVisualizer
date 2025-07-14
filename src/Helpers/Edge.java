@@ -23,7 +23,7 @@ public class Edge extends Group {
     public boolean containsNode(ItemNode n) {
         // if(isDirected) return n == n1;
         // else 
-        return n == n1 || n == n2;
+        return (n == n1) || (n == n2);
     }
 
     public ItemNode getn1 (){
@@ -51,7 +51,7 @@ public class Edge extends Group {
         double dx = x2 - x1;
         double dy = y2 - y1;
         double dist = Math.sqrt(dx * dx + dy * dy);
-        double r = n1.getNodeRadius();
+        double r = ItemNode.getNodeRadius();
 
 
         startX = x1 + dx * r / dist;

@@ -67,7 +67,7 @@ public class Stack extends DSAbstract<ItemNode> {
     }
     @Override
     protected void addNode(int val) {
-        ItemNode node = new ItemNode(val, startingX, startingY - Nodes.size() * 20);
+        ItemNode node = new ItemNode(val, startingX, startingY - Nodes.size() * 40);
         Nodes.add(node);
         node.flash(Color.LIMEGREEN);
     }

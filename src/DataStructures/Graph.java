@@ -22,6 +22,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
@@ -40,21 +41,28 @@ public class Graph extends DSAbstract<ItemNode> {
     boolean isDirected = false;
     ToggleGroup selectionGroup;
     int centerX = 250;
-    int centerY = 300;
+    int centerY = 200;
     int radius = 150;
 
     List<ItemNode> isGry = new ArrayList<>();
     Timeline timeline;
+    
 
     // dfs related:
     List<ItemNode> dfsOrder = new ArrayList<>();
-    boolean dfsIsPaused = true;
+    boolean dfsIsPaused = false;
     int curDfsIdx = -1;
+    List<ItemNode> dfsCallStack = new ArrayList<>();
+    int stackX = 600;
+    int stackY = 350;
 
     // bfs
     List<ItemNode> bfsOrder = new ArrayList<>();
-    boolean bfsIsPaused = true;
+    boolean bfsIsPaused = false;
     int curBfsIdx = -1;
+    List<ItemNode> bfsQueue =  new ArrayList<>();
+    int queueX = 100;
+    int queueY = 400;
 
     HashMap<ItemNode, Boolean> vis = new HashMap<>();
 
@@ -64,25 +72,27 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
+        VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
     }
 
-    public Graph(boolean isDirected) {
-        selectionGroup = new ToggleGroup();
-        initializeControls();
-        VisualPage.getCodeBox().setText(getCode());
-        VisualPage.getControlBox().getChildren().addAll(Controls);
-        VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
-    }
+    // public Graph(boolean isDirected) {
+    //     selectionGroup = new ToggleGroup();
+    //     initializeControls();
+    //     VisualPage.getCodeBox().setText(getCode());
+    //     VisualPage.getControlBox().getChildren().addAll(Controls);
+    //     VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+    //     VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
+
+    // }
 
     @Override
     public String getCode() {
-        // TODO Auto-generated method stub
         return "not implemented yet.";
     }
 
     @Override
     protected void initializeControls() {
-        // TODO Auto-generated method stub
         Button addNodeButton = new Button("Add node");
         TextField nodeField = new TextField();
         nodeField.setPrefWidth(100);
@@ -161,14 +171,14 @@ public class Graph extends DSAbstract<ItemNode> {
         startDFSbutton.setOnAction(e -> {
             String input = dfsField.getText().trim();
             if (!input.isEmpty()) {
-                try {
-                    int value = Integer.parseInt(input);
-                    ItemNode node = new ItemNode(value, 0, 0, false);
-                    if (!dataNodes.contains(node))
-                        return;
+                try { 
+                    int value = Integer.parseInt(input); 
+                    ItemNode node = null;
                     for (ItemNode el : dataNodes)
-                        if (el.equals(node))
+                        if (el.getElement() == value)
                             node = el;
+                    if (node == null)
+                        return;
 
                     dfsField.clear();
                     vis.clear();
@@ -186,13 +196,20 @@ public class Graph extends DSAbstract<ItemNode> {
             if (dfsIsPaused) {
                 if (curDfsIdx >= 0) {
                     ItemNode n = dfsOrder.get(curDfsIdx);
-                    if (isGry.contains(n)) {
+                    unHighlightCurDfsNode();
+                    if (isGry.contains(n)) { // gray
                         isGry.remove(n);
                         n.setNodeColor(Color.WHITE);
+                        n.setTextColor(Color.BLACK);
+                        StackRemove();
                     } else { // black
                         isGry.add(n);
                         n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.BLACK);
+                        n.setTextColor(Color.WHITE);
+                        dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
+                        stackY -= 40; 
+                        highlightCurDfsNode();
+                        refresh();
                     }
 
                     curDfsIdx--;
@@ -204,15 +221,22 @@ public class Graph extends DSAbstract<ItemNode> {
         nextDFSbutton.setOnAction(e -> { // copied from AnimateDfs
             if (dfsIsPaused) {
                 if (curDfsIdx < dfsOrder.size()) {
+                    unHighlightCurDfsNode();
                     curDfsIdx++;
                     ItemNode n = dfsOrder.get(curDfsIdx);
                     if (!isGry.contains(n)) { // white
                         isGry.add(n);
                         n.setNodeColor(Color.GREY);
+                        n.setTextColor(Color.WHITE);
+                        dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
+                        stackY -= 40; 
+                        highlightCurDfsNode();
+                        refresh();
                     } else { // grey
                         isGry.remove(n);
                         n.setNodeColor(Color.BLACK);
                         n.setTextColor(Color.WHITE);
+                        StackRemove();
                     }
                 }
             }
@@ -248,8 +272,12 @@ public class Graph extends DSAbstract<ItemNode> {
             if (!input.isEmpty()) {
                 try {
                     int value = Integer.parseInt(input);
-                    ItemNode node = new ItemNode(value, 0, 0, false);
-                    if (!dataNodes.contains(node))
+                    ItemNode node = null;
+                    for (ItemNode nod : dataNodes) {
+                        if (nod.getElement() == value)
+                            node = nod;
+                    }
+                    if (node == null)
                         return;
                     for (ItemNode el : dataNodes)
                         if (el.equals(node))
@@ -269,15 +297,29 @@ public class Graph extends DSAbstract<ItemNode> {
 
         previousBFSbutton.setOnAction(e -> {
             if (bfsIsPaused) {
-                if (curBfsIdx >= 0) {
+                if (curBfsIdx >= 0) { 
                     ItemNode n = bfsOrder.get(curBfsIdx);
                     if (isGry.contains(n)) {
                         isGry.remove(n);
                         n.setNodeColor(Color.WHITE);
+                        bfsQueue.removeLast(); queueX -= 40;
+                        refresh();
                     } else { // black
                         isGry.add(n);
                         n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.BLACK);
+                        n.setTextColor(Color.WHITE);
+                        n.highlight();
+                        for(ItemNode node : dataNodes) {
+                            if(node.getElement() == bfsQueue.getFirst().getElement()) {
+                                node.unHighlight();
+                            }
+                        }
+                        for(ItemNode el : bfsQueue) {
+                            el.setLocation(el.getX() + 40, el.getY());
+                        }
+                        bfsQueue.addFirst(new ItemNode(n.getElement(), 100, queueY));
+                        queueX += 40;
+                        refresh();
                     }
 
                     curBfsIdx--;
@@ -294,10 +336,14 @@ public class Graph extends DSAbstract<ItemNode> {
                     if (!isGry.contains(n)) { // white
                         isGry.add(n);
                         n.setNodeColor(Color.GREY);
+                        n.setTextColor(Color.WHITE);
+                        bfsQueue.add(new ItemNode(n.getElement(), queueX, queueY));
+                        queueX += 40; refresh();
                     } else { // grey
                         isGry.remove(n);
                         n.setNodeColor(Color.BLACK);
                         n.setTextColor(Color.WHITE);
+                        QueueRemove(); refresh();
                     }
                 }
             }
@@ -321,17 +367,24 @@ public class Graph extends DSAbstract<ItemNode> {
 
         getDfsOrder(node, dfsOrder);
 
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
+        timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             if (curDfsIdx < dfsOrder.size()) {
+                unHighlightCurDfsNode();
                 curDfsIdx++;
                 ItemNode n = dfsOrder.get(curDfsIdx);
                 if (!isGry.contains(n)) { // white
                     isGry.add(n);
                     n.setNodeColor(Color.GREY);
+                    n.setTextColor(Color.WHITE);
+                    dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
+                    stackY -= 40;
+                    highlightCurDfsNode();
+                    refresh();
                 } else { // grey
                     isGry.remove(n);
                     n.setNodeColor(Color.BLACK);
                     n.setTextColor(Color.WHITE);
+                    StackRemove(); 
                 }
             } else {
                 timeline.stop(); // end of animation
@@ -354,17 +407,23 @@ public class Graph extends DSAbstract<ItemNode> {
 
         getBfsOrder(node, bfsOrder);
 
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
+        timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             if (curBfsIdx < bfsOrder.size()) {
                 curBfsIdx++;
                 ItemNode n = bfsOrder.get(curBfsIdx);
                 if (!isGry.contains(n)) { // white
                     isGry.add(n);
                     n.setNodeColor(Color.GREY);
+                    n.setTextColor(Color.WHITE);
+                    bfsQueue.add(new ItemNode(n.getElement(), queueX, queueY));
+                    queueX += 40;
+                    refresh();
                 } else { // grey
                     isGry.remove(n);
                     n.setNodeColor(Color.BLACK);
                     n.setTextColor(Color.WHITE);
+                    QueueRemove();
+                    refresh();
                 }
             } else {
                 timeline.stop(); // end of animation
@@ -397,11 +456,13 @@ public class Graph extends DSAbstract<ItemNode> {
 
     @Override
     protected void addNode(int val) {
-        // TODO Auto-generated method stub
-        ItemNode newnode = new ItemNode(val, 0, 0, false);
-        if (dataNodes.contains(newnode))
-            return;
+        for (ItemNode nod : dataNodes) {
+            if (nod.getElement() == val)
+                return;
+        }
+
         nodeCount++;
+        ItemNode newnode = new ItemNode(val, 0, 0, false);
         dataNodes.add(newnode);
         for (int i = 0; i < nodeCount; i++) {
             double angle = 2 * Math.PI * i / nodeCount;
@@ -417,7 +478,6 @@ public class Graph extends DSAbstract<ItemNode> {
     }
 
     protected void removeGraphNode(TextField nodeField) {
-        // TODO Auto-generated method stub
         String input = nodeField.getText().trim();
         if (!input.isEmpty()) {
             try {
@@ -431,36 +491,38 @@ public class Graph extends DSAbstract<ItemNode> {
     }
 
     private void removeNode(int value) {
-        // TODO Auto-generated method stub
-        ItemNode node = new ItemNode(value, 0, 0, false);
-        int removeIdx = -1;
-        for (int i = 0; i < nodeCount; ++i) {
-            if (dataNodes.get(i).getElement() == value) {
-                // dataNodes.remove(i);
-                removeIdx = i;
-                break;
+        ItemNode nodeToRemove = null;
+        for(ItemNode el : dataNodes) {
+            if(el.getElement() == value) {
+                nodeToRemove = el; break;
             }
         }
-        if (removeIdx != -1) {
-            List<Edge> removedEdges = new ArrayList<>();
-            for (int i = 0; i < edges.size(); ++i) {
-                if (edges.get(i).containsNode(dataNodes.get(removeIdx))) {
-                    removedEdges.add(edges.get(i));
-                }
-            }
-            for (Edge e : removedEdges) {
-                edges.remove(e);
-            }
-            dataNodes.remove(removeIdx);
-            nodeCount--;
-            adj.get(node).clear();
+        if(nodeToRemove == null) {
+            return;
         }
+
+        List<Edge> removedEdges = new ArrayList<>();
+        for(Edge e : edges) {
+            if (e.containsNode(nodeToRemove)) {
+                removedEdges.add(e);
+            }
+        }
+        for (Edge e : removedEdges) {
+            edges.remove(e);
+        }
+        for (List<ItemNode> neighbors : adj.values()) {
+            neighbors.remove(nodeToRemove);
+        }
+        adj.remove(nodeToRemove);
+
+        dataNodes.remove(nodeToRemove);
+        nodeCount--;
+        
         refresh();
     }
 
     @Override
     protected void removeLastNode() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -539,6 +601,9 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().clear();
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
         VisualPage.getAnimationPane().getChildren().addAll(edges);
+        VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
+        VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
+        highlightCurBfsNode();
     }
 
     void removeEdge(ItemNode n1, ItemNode n2) {
@@ -554,6 +619,7 @@ public class Graph extends DSAbstract<ItemNode> {
     }
 
     void getDfsOrder(ItemNode node, List<ItemNode> dfsOrder) {
+
         dfsOrder.add(node);
         vis.put(node, true);
         for (ItemNode e : adj.get(node)) {
@@ -565,7 +631,6 @@ public class Graph extends DSAbstract<ItemNode> {
     }
 
     private void getBfsOrder(ItemNode node, List<ItemNode> bfsOrder) {
-        // TODO Auto-generated method stub
         Queue<ItemNode> q = new LinkedList<>();
         q.add(node);
         List<ItemNode> vis = new ArrayList<>();
@@ -584,6 +649,87 @@ public class Graph extends DSAbstract<ItemNode> {
 
             bfsOrder.add(cur);
         }
+    }
+
+    private void StackRemove() {
+        dfsCallStack.getLast().flash(Color.RED);
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.6));
+            pause.setOnFinished(event -> {
+                dfsCallStack.removeLast(); 
+                highlightCurDfsNode();
+                refresh();
+            });
+            pause.play();
+        
+        stackY += 40;
+    }
+
+    private void QueueRemove() {
+        bfsQueue.getFirst().flash(Color.RED);
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.6));
+            pause.setOnFinished(event -> {
+                unHighlightCurBfsNode();
+                bfsQueue.removeFirst(); 
+                for(ItemNode el : bfsQueue) {
+                    el.setLocation(el.getX() - 40, el.getY());
+                }
+                refresh();
+            });
+            pause.play();
+        
+        queueX -= 40;
+    }
+
+    private void highlightCurDfsNode() {
+        if(!dfsCallStack.isEmpty()) {
+                    int cur = dfsCallStack.getLast().getElement();
+                    ItemNode curNode = null;
+                    for(ItemNode el : dataNodes) {
+                        if(el.getElement() == cur) {
+                            curNode = el; break;
+                        }
+                    }
+                    curNode.highlight();
+                }
+    }
+
+    private void unHighlightCurDfsNode() {
+        if(!dfsCallStack.isEmpty()) {
+                    int cur = dfsCallStack.getLast().getElement();
+                    ItemNode curNode = null;
+                    for(ItemNode el : dataNodes) {
+                        if(el.getElement() == cur) {
+                            curNode = el; break;
+                        }
+                    }
+                    curNode.unHighlight();
+                }
+    }
+
+    private void highlightCurBfsNode() {
+        if(!bfsQueue.isEmpty()) {
+                    int cur = bfsQueue.getFirst().getElement();
+                    ItemNode curNode = null;
+                    for(ItemNode el : dataNodes) {
+                        if(el.getElement() == cur) {
+                            curNode = el; break;
+                        }
+                    }
+                    curNode.highlight();
+                }
+    }
+
+    private void unHighlightCurBfsNode() {
+        if(!bfsQueue.isEmpty()) {
+                    int cur = bfsQueue.getFirst().getElement();
+                    ItemNode curNode = null;
+                    for(ItemNode el : dataNodes) {
+                        if(el.getElement() == cur) {
+                            curNode = el; break;
+                        }
+                    }
+                    curNode.unHighlight();
+                }
     }
 
 }

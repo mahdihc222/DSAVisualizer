@@ -85,6 +85,7 @@ public class ItemNode extends Group {
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
+
         
         text = new Text(String.valueOf(elem));
         text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
@@ -241,18 +242,19 @@ public class ItemNode extends Group {
         return NODEHEIGHT;
     }
 
-    public boolean equals(Object other) {
-        if(this == other) return true;
-        if(other == null || getClass() != other.getClass()) return false;
 
-        int x = Integer.parseInt(text.getText());
-        int y = Integer.parseInt(((ItemNode)other).text.getText());
-        return x == y;
-    }
 
     public int hashCode() {
         int x = Integer.parseInt(text.getText());
         return Objects.hash(x);
+    }
+
+    public void highlight() {
+        boundary.setStrokeWidth(6);
+    }
+
+    public void unHighlight() {
+        boundary.setStrokeWidth(1);
     }
 
 }
