@@ -30,6 +30,9 @@ public class ItemNode extends Group {
     private final int TEXTSIZE=12; //final int to hold textsize
     private final String FONTNAME = "Arial"; //final string to hold fontname
     //constructor to create rectangular nodes with index
+
+
+
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
         boundary = new Rectangle(nodeX, nodeY, NODEHEIGHT, NODEWIDTH);
         boundary.setFill(Color.WHITE);
@@ -250,7 +253,11 @@ public class ItemNode extends Group {
     }
 
     public void highlight() {
-        boundary.setStrokeWidth(6);
+
+        if(boundary instanceof Circle){
+            boundary.setStrokeWidth(6);
+        }
+        else boundary.setStrokeWidth(3);
     }
 
     public void unHighlight() {

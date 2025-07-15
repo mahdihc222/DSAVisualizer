@@ -152,6 +152,8 @@ public class VisualPage {
             ds = new Graph();
         } else if (s.equals("List")) {
             ds = new MyList();
+        }  else if(s.equals("Queue")) {
+            ds = new Queue();
         }
 
         return root;

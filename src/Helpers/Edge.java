@@ -7,16 +7,16 @@ public class Edge extends Group {
     ItemNode n1, n2;
     Line edge, arrow1, arrow2;
     boolean isDirected;
-    double startX, startY, endX, endY;
+    double startX, startY, endX, endY;  
 
-    public Edge(ItemNode n1, ItemNode n2, boolean isDirected) {
+    public Edge(ItemNode n1, ItemNode n2, boolean isDirected, boolean isCircle) {
         this.isDirected = isDirected;
         
         if(isDirected){
-            addLineWithArrowhead(n1, n2);
+            addLineWithArrowhead(n1, n2, isCircle);
         }
         else{
-            addLine(n1, n2);
+            addLine(n1, n2, isCircle);
         }   
     }
 
@@ -41,30 +41,38 @@ public class Edge extends Group {
         return (this.n1 == n1 && this.n2 == n2) || (this.n1 == n2 && this.n2 == n1);
     }
 
-    private void addLine(ItemNode n1, ItemNode n2){
-        this.n1 = n1;
-        this.n2 = n2;
-        double x1 = n1.getX();
-        double y1 = n1.getY();
-        double x2 = n2.getX();
-        double y2 = n2.getY();
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        double r = ItemNode.getNodeRadius();
+    private void addLine(ItemNode n1, ItemNode n2, boolean isCircle){
+        if(isCircle) {
+            this.n1 = n1;
+            this.n2 = n2;
+            double x1 = n1.getX();
+            double y1 = n1.getY();
+            double x2 = n2.getX();
+            double y2 = n2.getY();
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            double r = ItemNode.getNodeRadius();
 
 
-        startX = x1 + dx * r / dist;
-        startY = y1 + dy * r / dist;
-        endX = x2 - dx * r / dist;
-        endY = y2 - dy * r / dist;
-                
-        edge = new Line(startX, startY, endX, endY);
-        getChildren().add(edge);
+            startX = x1 + dx * r / dist;
+            startY = y1 + dy * r / dist;
+            endX = x2 - dx * r / dist;
+            endY = y2 - dy * r / dist;
+                    
+            edge = new Line(startX, startY, endX, endY);
+            getChildren().add(edge);
+        }else{
+            double startX = n1.getX() + 40;
+            double startY = n1.getY() + 20;
+            double endX = n2.getX();
+            double endY = startY;
+            getChildren().add(new Line(startX, startY, endX, endY));
+        }
     }
 
-    private void addLineWithArrowhead(ItemNode n1, ItemNode n2) {
-        addLine(n1, n2);
+    private void addLineWithArrowhead(ItemNode n1, ItemNode n2, boolean isCircle) {
+        addLine(n1, n2, isCircle);
 
         double dx = endX - startX;
         double dy = endY - startY;
@@ -88,10 +96,10 @@ public class Edge extends Group {
     public void redraw() {
         getChildren().clear();
         if(isDirected){
-            addLineWithArrowhead(n1, n2);
+            addLineWithArrowhead(n1, n2, true);
         }
         else{
-            addLine(n1, n2);
+            addLine(n1, n2, true);
         }   
     }
 }
