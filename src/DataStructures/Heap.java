@@ -73,8 +73,7 @@ public class Heap extends DSAbstract<ItemNode> {
         Button popButton = new Button("Pop");
         HBox popRow = new HBox(10, popButton);
 
-        VBox pushPopBox = new VBox();
-        pushPopBox.getChildren().addAll(pushRow,popRow);
+        VBox pushPopBox = new VBox(10,pushRow,popRow);
 
         RadioButton isMinHeapButton = new RadioButton("Minimum Heap");
         RadioButton isMaxHeapButton = new RadioButton("Maximum Heap");
@@ -162,7 +161,7 @@ public class Heap extends DSAbstract<ItemNode> {
         dataNodes.add(node);
         if (index > 2)
             heapify(index - 2);
-        VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
+        VisualPage.getAnimationPane().getChildren().add(node);
     }
 
     private void heapify(int index) {
@@ -235,8 +234,8 @@ public class Heap extends DSAbstract<ItemNode> {
             returnLabel.setFont(new Font("Consolas",14));
             returnLabel.setLayoutX(5);
             returnLabel.setLayoutY(5);
+            VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
             VisualPage.getAnimationPane().getChildren().add(returnLabel);
-            VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
             index--;
             if (dataNodes.size() > 1)
                 fixHeap(new AtomicInteger(0));

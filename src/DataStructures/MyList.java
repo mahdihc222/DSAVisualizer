@@ -2,6 +2,7 @@ package DataStructures;
 
 import Helpers.ItemNode;
 import Pages.VisualPage;
+import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
@@ -10,26 +11,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.util.Duration;
 
 public class MyList extends DSAbstract<ItemNode> {
 
-    private int currentX, currentY;
+    private int lastX, currentY;
     private final int NODEWIDTH=40;
     private int currentIndex;
-    private int startingX, startingY;
+    private int startingX;
     private int offsetY;
     private Line currentIndexIndicator;
     private final int INDICATORHEIGHT = 50;
     public MyList(){
         super();
-        startingX = currentX = 50;
-        startingY= currentY = 100;
+        startingX = lastX = 50;
+        currentY = 100;
         currentIndex = 0;
         initializeControls();
         
         VisualPage.getControlBox().getChildren().addAll(Controls);
         showCode();
-        currentIndexIndicator = new Line(currentX,currentY-5,currentX,currentY-5+INDICATORHEIGHT);
+        currentIndexIndicator = new Line(lastX,currentY-5,lastX,currentY-5+INDICATORHEIGHT);
         currentIndexIndicator.setStroke(Color.RED);
         currentIndexIndicator.setStrokeWidth(3);
         VisualPage.getAnimationPane().getChildren().add(currentIndexIndicator);
@@ -43,7 +45,7 @@ public class MyList extends DSAbstract<ItemNode> {
     }
 
     private void moveIndicatorRight(){
-        if(currentIndexIndicator.getStartX()==currentX) return;
+        if(currentIndexIndicator.getStartX()==lastX) return;
         currentIndex++;
         currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()+(NODEWIDTH+10));
         currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()+(NODEWIDTH+10));
@@ -84,20 +86,8 @@ public class MyList extends DSAbstract<ItemNode> {
         // standardizeButton(rightArrow);
         rightArrow.setOnAction(e->moveIndicatorRight());
         HBox arrowBox = new HBox(5, leftArrow,rightArrow);
-
-        Button bubbleSortButton = new Button("Bubble Sort");
-        Button selectionSortButton = new Button("Selection Sort");
-        Button insertionSortButton = new Button("Insertion Sort");
-        Button mergeSortButton = new Button("Merge Sort");
-        Button quickSortButton = new Button("Quick Sort");
-
-        
-
-        VBox rightSideControlBox = new VBox(10,arrowBox,bubbleSortButton,selectionSortButton,insertionSortButton,mergeSortButton,quickSortButton);
-
+        VBox rightSideControlBox = new VBox(10,arrowBox);
         HBox totalBox = new HBox(20,pushPopBox,rightSideControlBox);
-
-
         Controls.add(totalBox);
     }
 
@@ -105,6 +95,9 @@ public class MyList extends DSAbstract<ItemNode> {
     protected void showCode(){
         Tab arrayListTab = new Tab("Array List");
         //arrayListTab.setContent(getCodeTextArea("ArrayList"));
+
+        //VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+
     }
 
     private void delete(TextField removeField){
@@ -113,7 +106,7 @@ public class MyList extends DSAbstract<ItemNode> {
         if (!input.isEmpty()) {
             try {
                 int value = Integer.parseInt(input);
-                addNode(value);
+                removeNode(value);
                 removeField.clear(); 
             } catch (NumberFormatException ex) {
                 return;
@@ -141,13 +134,14 @@ public class MyList extends DSAbstract<ItemNode> {
     protected void addNode(int val) {
         ItemNode newNode = new ItemNode(val,(int) currentIndexIndicator.getStartX(), currentY, currentIndex);
         dataNodes.add(currentIndex,newNode);
+        dataNodes.get(currentIndex).flash(Color.GREEN);
         currentIndex++;
         for(int i=currentIndex; i<dataNodes.size();i++){
             ItemNode curNode = dataNodes.get(i);
             curNode.setLocation(curNode.getX()+10+NODEWIDTH, curNode.getY());
             curNode.setIndex(i);
         }
-        currentX+= 10 + NODEWIDTH;
+        lastX+= 10 + NODEWIDTH;
 
         currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()+NODEWIDTH+10);
         currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()+NODEWIDTH+10);
@@ -158,23 +152,50 @@ public class MyList extends DSAbstract<ItemNode> {
     protected void removeLastNode() {
         if(currentIndex>0){
             currentIndex--;
+            VisualPage.getAnimationPane().getChildren().removeAll(dataNodes);
+            dataNodes.get(currentIndex).flash(Color.RED);
             dataNodes.remove(currentIndex);
             for(int i=currentIndex; i<dataNodes.size(); i++){
                 ItemNode curNode = dataNodes.get(i);
                 curNode.setLocation(curNode.getX()-(10+NODEWIDTH), curNode.getY());
                 curNode.setIndex(i);
             }
-        
+            lastX-= 10 +NODEWIDTH;
             currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()-(NODEWIDTH+10));
             currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()-(NODEWIDTH+10));
-            VisualPage.getAnimationPane().getChildren().remove(currentIndex);
+            VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+            
         }
     }
 
-    // private void updateVisuals(){
-    //    // VisualPage.getAnimationPane().getChildren().clear();
-    //     VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
-    //     VisualPage.getAnimationPane().getChildren().add(currentIndexIndicator);
-    // }
+    private void removeNode(int value){
+        VisualPage.getAnimationPane().getChildren().removeAll(dataNodes);
+        int i;
+        for(i=0; i<dataNodes.size(); i++){
+            ItemNode curNode = dataNodes.get(i);
+            if(curNode.getElement() == value){
+                break;
+            }
+        }
+        //dataNodes.get(i).flash(Color.RED);
+        final int INDEXTOREMOVE = i;
+        dataNodes.remove(INDEXTOREMOVE);
+        
+        for(int j=INDEXTOREMOVE; j<dataNodes.size(); j++){
+                ItemNode nextNode = dataNodes.get(j);
+                nextNode.setLocation(nextNode.getX()-(10+NODEWIDTH), nextNode.getY());
+                nextNode.setIndex(j);
+            }
+
+        lastX -= (10 + NODEWIDTH);
+        if(currentIndex>=INDEXTOREMOVE){ 
+            currentIndex--;
+            currentIndexIndicator.setStartX(currentIndexIndicator.getStartX()-(NODEWIDTH+10));
+            currentIndexIndicator.setEndX(currentIndexIndicator.getEndX()-(NODEWIDTH+10));
+        }
+        VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        
+
+    }
     
 }

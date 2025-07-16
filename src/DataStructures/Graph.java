@@ -10,6 +10,7 @@ import Helpers.Edge;
 import Pages.VisualPage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -88,17 +89,17 @@ public class Graph extends DSAbstract<ItemNode> {
 
     // }
 
-    @Override
-    public String getCode() {
-        return "not implemented yet.";
-    }
 
     @Override
     protected void showCode(){
         Tab dfsTab = new Tab("DFS");
         Tab bfsTab = new Tab("BFS");
 
+        //dfsTab.setContent(getCodeTextArea("DFS"));
         //call getCodeTextArea with appropriate titles
+       // VisualPage.getCodePane().getTabs().add(dfsTab);
+        //VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+
     }
 
     @Override
@@ -534,7 +535,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     @Override
     protected void removeLastNode() {
-
+        //Not needed here
     }
 
     void addGraphEdge(TextField t1, TextField t2) {

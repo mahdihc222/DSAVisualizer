@@ -150,9 +150,8 @@ public class ItemNode extends Group {
             
         }
         else{
-            Rectangle boun = (Rectangle)boundary;
-            boun.setX(x);
-            boun.setY(y);
+            ((Rectangle)boundary).setX(x);
+            ((Rectangle)boundary).setY(y);
         }
         updateTextPosition();
         updateIndexPosition();
@@ -255,6 +254,11 @@ public class ItemNode extends Group {
 
     public void unHighlight() {
         boundary.setStrokeWidth(1);
+    }
+
+    public void setElement(int a){
+        text.setText(String.valueOf(a));
+        updateTextPosition();
     }
 
 }
