@@ -24,11 +24,18 @@ public class ItemNode extends Group {
     @SuppressWarnings("unused") //redundant warning, needed later
     private boolean isRectangle = true;
 
+
     static final int NODEHEIGHT = 40;
     static final int NODEWIDTH = 40;
     static final int NODERADIUS = 20;
     private final int TEXTSIZE=12; //final int to hold textsize
     private final String FONTNAME = "Arial"; //final string to hold fontname
+    
+    //constructor to deep copy an itemnode without index
+    // public ItemNode (ItemNode item){
+    //     this.text = new Text(item.text);
+    // }
+    
     //constructor to create rectangular nodes with index
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
         boundary = new Rectangle(nodeX, nodeY, NODEHEIGHT, NODEWIDTH);
@@ -119,9 +126,7 @@ public class ItemNode extends Group {
         }
     }
 
-    public int getElement() {
-        return Integer.parseInt(text.getText());
-    }
+   
 
     public double getX(){
         if(boundary instanceof Circle) return ((Circle)boundary).getCenterX();
@@ -259,6 +264,9 @@ public class ItemNode extends Group {
     public void setElement(int a){
         text.setText(String.valueOf(a));
         updateTextPosition();
+    }
+     public int getElement() {
+        return Integer.parseInt(text.getText());
     }
 
 }
