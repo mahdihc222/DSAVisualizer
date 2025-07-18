@@ -84,6 +84,7 @@ public class Sorting extends DSAbstract<ItemNode> {
         Button bubbleSortButton = new Button("Bubble Sort");
         bubbleSortButton.setOnAction(e -> bubbleSortAnimated());
         Button selectionSortButton = new Button("Selection Sort");
+        selectionSortButton.setOnAction(e -> selectionSortAnimated());
         Button insertionSortButton = new Button("Insertion Sort");
         insertionSortButton.setOnAction(e -> insertionSortAnimated());
         Button mergeSortButton = new Button("Merge Sort");
@@ -209,9 +210,9 @@ public class Sorting extends DSAbstract<ItemNode> {
     }
 
     /** Animates two ItemNodes swapping places: down → sideways → up. */
-    private SequentialTransition animateSwap(ItemNode left, ItemNode right) {
+    private SequentialTransition animateSwap(ItemNode left, ItemNode right, int diff) {
         double downOffset = NODEWIDTH * 0.8; // how far down
-        double dx = NODEWIDTH + 10; // horizontal distance
+        double dx = (NODEWIDTH + 10) * diff; // horizontal distance
 
         // --- LEFT BLOCK ---
         TranslateTransition leftDown = new TranslateTransition(Duration.millis(200), left);
@@ -305,7 +306,7 @@ public class Sorting extends DSAbstract<ItemNode> {
                     swappedAny = true;
 
                     // visual swap
-                    wholeSort.getChildren().add(animateSwap(A, B));
+                    wholeSort.getChildren().add(animateSwap(A, B, 1));
 
                     // swap in list
 
@@ -363,6 +364,12 @@ public class Sorting extends DSAbstract<ItemNode> {
         return pause;
     }
 
+    private PauseTransition animateColorChangeFast(ItemNode node, Color color) {
+        PauseTransition pause = new PauseTransition(Duration.millis(1));
+        pause.setOnFinished(e -> node.setNodeColor(color));
+        return pause;
+    }
+
     private PauseTransition setColorOfAll(List<ItemNode> nodes, Color color) {
         PauseTransition pause = new PauseTransition(Duration.seconds(0.2));
         pause.setOnFinished(e -> {
@@ -374,192 +381,109 @@ public class Sorting extends DSAbstract<ItemNode> {
     }
 
     private void insertionSortAnimated() {
-    Label keyLabel = new Label("Key: ");
-    keyLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 16));
-    keyLabel.setLayoutX(arrayX + 10);
-    keyLabel.setLayoutY(arrayY + 150);
-    VisualPage.getAnimationPane().getChildren().add(keyLabel);
+        Label keyLabel = new Label("Key: ");
+        keyLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 16));
+        keyLabel.setLayoutX(arrayX + 10);
+        keyLabel.setLayoutY(arrayY + 150);
+        VisualPage.getAnimationPane().getChildren().add(keyLabel);
 
-    SequentialTransition master = new SequentialTransition();
-    int n = dataNodes.size();
+        SequentialTransition master = new SequentialTransition();
+        int n = dataNodes.size();
 
-    for (int i = 1; i < n; ++i) {
-        final int ii = i;
-        // Color sorted part
-        for (int k = 0; k < i; k++) {
-            final int kk = k;
-            master.getChildren().add(animateColorChange(dataNodes.get(kk), Color.LIMEGREEN));
+        for (int i = 1; i < n; ++i) {
+            final int ii = i;
+            // Color sorted part
+            for (int k = 0; k < i; k++) {
+                final int kk = k;
+                master.getChildren().add(animateColorChange(dataNodes.get(kk), Color.LIMEGREEN));
+            }
+
+            ItemNode innerKeyNode = duplicateItemNode(dataNodes.get(ii));
+            PauseTransition initializerPause = new PauseTransition(Duration.seconds(0.1));
+            initializerPause.setOnFinished(e -> {
+                VisualPage.getAnimationPane().getChildren().add(innerKeyNode);
+            });
+            master.getChildren().add(initializerPause);
+            // master.getChildren().add(moveNode(innerKeyNode, innerKeyNode.getLayoutX() +
+            // innerKeyNode.getTranslateX()
+            // - (keyLabel.getLayoutX() + keyLabel.getTranslateX()), -1));
+            master.getChildren().add(moveNode(innerKeyNode, 150, -2));
+
+            // Use a helper to animate the inner loop
+            master.getChildren().add(animateInsertionInnerLoop(ii - 1, innerKeyNode));
+            PauseTransition pr = new PauseTransition(Duration.millis(1));
+            pr.setOnFinished(e -> {
+                System.out.print("Current data: ");
+                for (ItemNode node : dataNodes)
+                    System.out.print(node.getElement() + " ");
+                System.out.println();
+            });
+            master.getChildren().add(pr);
+
         }
 
-        ItemNode innerKeyNode = duplicateItemNode(dataNodes.get(ii));
-        PauseTransition initializerPause = new PauseTransition(Duration.seconds(0.1));
-        initializerPause.setOnFinished(e -> {
-            VisualPage.getAnimationPane().getChildren().add(innerKeyNode);
-        });
-        master.getChildren().add(initializerPause);
-        master.getChildren().add(moveNode(innerKeyNode, innerKeyNode.getLayoutX() - (keyLabel.getLayoutX()) - 100, -1));
-        master.getChildren().add(moveNode(innerKeyNode, 150, -2));
-
-        // Use a helper to animate the inner loop
-        master.getChildren().add(animateInsertionInnerLoop(ii - 1, innerKeyNode));
+        master.play();
     }
 
-    master.play();
-}
+    /**
+     * Recursively animates the inner loop of insertion sort for index j.
+     * Returns a SequentialTransition that performs the necessary steps.
+     */
+    private SequentialTransition animateInsertionInnerLoop(int j, ItemNode keyNode) {
+        SequentialTransition seq = new SequentialTransition();
 
-/**
- * Recursively animates the inner loop of insertion sort for index j.
- * Returns a SequentialTransition that performs the necessary steps.
- */
-private SequentialTransition animateInsertionInnerLoop(int j, ItemNode keyNode) {
-    SequentialTransition seq = new SequentialTransition();
+        if (j < 0) {
+            System.out.println("Now j: " + j + ", terminating with keyNode: " + keyNode.getElement());
+            seq.getChildren()
+                    .add(animateKeyGoingUp(keyNode, dataNodes.get(j + 1), 0));
+            return seq;
+        }
 
-    if (j < 0 || dataNodes.get(j).getElement() <= keyNode.getElement()) {
-        // Place the keyNode at the correct position
-        seq.getChildren().add(animateKeyGoingUp(keyNode, dataNodes.get(j + 1)));
+        if (dataNodes.get(j).getElement() <= keyNode.getElement()) {
+            // Place the keyNode at the correct position
+            System.out.println("Now j: " + j + ", terminating with keyNode: " + keyNode.getElement() + " jnode: "
+                    + dataNodes.get(j).getElement());
+            seq.getChildren()
+                    .add(animateKeyGoingUp(keyNode, dataNodes.get(j + 1), dataNodes.indexOf(keyNode) - (j + 1)));
+            return seq;
+        }
+        System.out
+                .println("Now j: " + j + ", key: " + keyNode.getElement() + " jNode: " + dataNodes.get(j).getElement());
+
+        // Animate comparison
+        seq.getChildren().add(animateColorChangePair(dataNodes.get(j), dataNodes.get(j + 1), Color.ORANGE));
+        // Animate shift
+        seq.getChildren().add(animateValueShiftRight(dataNodes.get(j), dataNodes.get(j + 1)));
+        // Reset color
+        seq.getChildren().add(animateColorChangePair(dataNodes.get(j), dataNodes.get(j + 1), Color.SKYBLUE));
+        // dataNodes.set(j + 1, dataNodes.get(j));
+        // Recursively animate the next step
+        seq.getChildren().add(animateInsertionInnerLoop(j - 1, keyNode));
         return seq;
     }
 
-    // Animate comparison
-    seq.getChildren().add(animateColorChangePair(dataNodes.get(j), dataNodes.get(j + 1), Color.ORANGE));
-    // Animate shift
-    seq.getChildren().add(animateValueShiftRight(dataNodes.get(j), dataNodes.get(j + 1)));
-    // Reset color
-    seq.getChildren().add(animateColorChangePair(dataNodes.get(j), dataNodes.get(j + 1), Color.WHITE));
-
-    // Recursively animate the next step
-    seq.getChildren().add(animateInsertionInnerLoop(j - 1, keyNode));
-    return seq;
-}
-
-    // private void insertionSortAnimated() {
-    //     Label keyLabel = new Label("Key: ");
-    //     keyLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 16));
-    //     keyLabel.setLayoutX(arrayX + 10);
-    //     keyLabel.setLayoutY(arrayY + 150);
-    //     VisualPage.getAnimationPane().getChildren().add(keyLabel);
-
-    //     SequentialTransition master = new SequentialTransition();
-    //     int n = dataNodes.size();
-    //     int i;
-    //     AtomicInteger j = new AtomicInteger();
-    //     for (i = 1; i < n; ++i) {
-    //         final int ii = i;
-    //         for (int k = 0; k < i; k++) {
-    //             final int kk = k;
-    //             master.getChildren().add(animateColorChange(dataNodes.get(kk),
-    //                     Color.LIMEGREEN));
-    //         }
-
-    //         ItemNode innerKeyNode = duplicateItemNode(dataNodes.get(ii));
-
-    //         PauseTransition initializerPause = new PauseTransition(Duration.seconds(0.1));
-    //         initializerPause.setOnFinished(e -> {
-    //             VisualPage.getAnimationPane().getChildren().add(innerKeyNode);
-    //         });
-    //         master.getChildren().add(initializerPause);
-    //         master.getChildren().add(
-    //                 moveNode(innerKeyNode, innerKeyNode.getX() - (keyLabel.getLayoutX()) - 100, -1));
-    //         master.getChildren().add(moveNode(innerKeyNode, 150, -2));
-    //         j.set(i);
-    //         while (j.get() >= 0) {
-    //             final int jj = j.get();
-    //             master.getChildren().add(animateColorChangePair(dataNodes.get(jj),
-    //                     dataNodes.get(jj + 1), Color.ORANGE));
-    //             if (dataNodes.get(jj).getElement() > dataNodes.get(jj + 1).getElement()) {
-    //                 master.getChildren().add(animateValueShiftRight(dataNodes.get(jj),
-    //                         dataNodes.get(jj + 1)));
-    //                 master.getChildren().add(animateColorChangePair(dataNodes.get(jj),
-    //                         dataNodes.get(jj + 1), Color.WHITE));
-    //             } else {
-    //                 master.getChildren().add(animateColorChangePair(dataNodes.get(jj),
-    //                         dataNodes.get(jj + 1), Color.WHITE));
-    //                 break;
-    //             }
-                
-    //             PauseTransition jupdater = new PauseTransition(Duration.millis(10));
-    //             jupdater.setOnFinished(e->{
-    //                 j.set(j.get()-1);
-    //             });
-    //             master.getChildren().add(jupdater);
-    //         }
-    //         master.getChildren().add(animateKeyGoingUp(innerKeyNode,
-    //                 dataNodes.get(j.get() + 1)));
-    //     }
-
-    //     master.play();
-    // }
-
-    // private SequentialTransition animateKeyGoingUp(ItemNode A, ItemNode B, int keyValue) {
-    //     double dy = B.getY() - A.getY();
-    //     double dx = B.getX() - A.getX();
-
-    //     TranslateTransition moveRight = new TranslateTransition(Duration.millis(300),
-    //             A);
-    //     moveRight.setByX(dx);
-
-    //     TranslateTransition moveUp = new TranslateTransition(Duration.millis(200),
-    //             A);
-    //     moveUp.setByY(dy);
-
-    //     PauseTransition finalize = new PauseTransition(Duration.millis(100));
-    //     finalize.setOnFinished(e -> {
-    //         B.setElement(keyValue);
-    //         VisualPage.getAnimationPane().getChildren().remove(A);
-    //         A.setTranslateX(0);
-    //         A.setTranslateY(0);
-    //         B.setTranslateX(0);
-    //         B.setTranslateY(0);
-    //     });
-
-    //     return new SequentialTransition(moveRight, moveUp, finalize);
-    // }
-
-    // private SequentialTransition animateValueShiftRight(ItemNode A, ItemNode B) {
-    // ItemNode temp = duplicateItemNode(A);
-    // temp.setNodeColor(Color.CORAL);
-    // VisualPage.getAnimationPane().getChildren().add(temp);
-
-    // SequentialTransition seq = new SequentialTransition();
-    // seq.getChildren().add(moveNode(temp, NODEWIDTH * 0.8, -2)); // down
-    // seq.getChildren().add(moveNode(temp, NODEWIDTH + 10, 1)); // right
-    // seq.getChildren().add(moveNode(temp, NODEWIDTH * 0.8, 2)); // up
-
-    // PauseTransition finalize = new PauseTransition(Duration.millis(100));
-    // finalize.setOnFinished(e -> {
-    // B.setElement(A.getElement());
-    // VisualPage.getAnimationPane().getChildren().remove(temp);
-    // });
-
-    // seq.getChildren().add(finalize);
-
-    // return seq;
-    // }
-
-    private SequentialTransition animateKeyGoingUp( ItemNode A, ItemNode B) {
-        //double dy = B.getLayoutY() - A.getLayoutY();
-        //double dx = B.getLayoutX() - A.getLayoutX(); // horizontal distance
-        double dx = -100;
-        double dy = -60;
+    private SequentialTransition animateKeyGoingUp(ItemNode A, ItemNode B, int diff) {
+        double dy = -150;
+        double dx = (NODEWIDTH + 10) * diff;
+        // double dx = -100;
         TranslateTransition rightMove = new TranslateTransition(Duration.millis(300),
                 A);
         rightMove.setByX(dx);
         TranslateTransition upMove = new TranslateTransition(Duration.millis(300),
                 A);
-         upMove.setByY(dy);
-
-        
+        upMove.setByY(dy);
 
         // when finished: restore layoutX/Y & clear translate offsets
         PauseTransition pr = new PauseTransition(Duration.millis(200));
         pr.setOnFinished(e -> {
-            A.setTranslateX(0);
-            A.setTranslateY(0);
-
             B.setElement(A.getElement());
             VisualPage.getAnimationPane().getChildren().remove(A);
+            // int idxB = dataNodes.indexOf(B);
+            // if (idxB != -1) {
+            // dataNodes.set(idxB, A); // A is the key node
+            // }
         });
-        SequentialTransition seq = new SequentialTransition(rightMove,upMove,pr);
+        SequentialTransition seq = new SequentialTransition(rightMove, upMove, pr);
 
         return new SequentialTransition(
                 new PauseTransition(Duration.millis(50)), // tiny gap before swap
@@ -570,12 +494,12 @@ private SequentialTransition animateInsertionInnerLoop(int j, ItemNode keyNode) 
     private SequentialTransition animateValueShiftRight(ItemNode A, ItemNode B) {
         final ItemNode temp = duplicateItemNode(A);
         PauseTransition pr1 = new PauseTransition(Duration.millis(10));
-        pr1.setOnFinished(e->{
-            
+        pr1.setOnFinished(e -> {
+
             temp.setNodeColor(Color.CORAL);
             VisualPage.getAnimationPane().getChildren().add(temp);
         });
-        
+
         SequentialTransition st = new SequentialTransition(pr1);
         st.getChildren().add(moveNode(temp, NODEWIDTH * 1.6, -2));
         st.getChildren().add(moveNode(temp, NODEWIDTH + 10, 1));
@@ -584,55 +508,106 @@ private SequentialTransition animateInsertionInnerLoop(int j, ItemNode keyNode) 
         pr.setOnFinished(e -> {
             B.setElement(A.getElement());
             VisualPage.getAnimationPane().getChildren().remove(temp);
+            // int idxA = dataNodes.indexOf(A);
+            // int idxB = dataNodes.indexOf(B);
+            // if (idxA != -1 && idxB != -1) {
+            // dataNodes.set(idxB, dataNodes.get(idxA));
+            // }
         });
         st.getChildren().add(pr);
-        // st.setOnFinished(e -> {
-            
-        // });
         return st;
 
     }
 
     private SequentialTransition moveNode(Node n, double distance, int dir) {
-        ItemNode it = (ItemNode)n;
+        ItemNode it = (ItemNode) n;
         TranslateTransition tr = new TranslateTransition(Duration.seconds(0.2), it);
-        PauseTransition pr = new PauseTransition(Duration.seconds(0.01));
         switch (dir) {
             case 1: // RIGHT
                 tr.setByX(distance);
-                pr.setOnFinished(e->{
-                    it.setTranslateX(0);
-                    it.setLayoutX(it.getLayoutX() + distance);
-                }); 
                 break;
             case -1: // LEFT
                 tr.setByX(distance * -1);
-                pr.setOnFinished(e->{
-                    it.setTranslateX(0);
-                    it.setLayoutX(it.getLayoutX() - distance);
-                });
-                
                 break;
             case 2: // UP
                 tr.setByY(distance * -1);
-                pr.setOnFinished(e->{
-                    it.setTranslateY(0);
-                    it.setLayoutY(it.getLayoutY() - distance);
-                });
-                
                 break;
             case -2:// DOWN
                 tr.setByY(distance);
-                pr.setOnFinished(e->{
-                    it.setTranslateY(0);
-                    it.setLayoutY(it.getLayoutY() + distance);
-                });
-                
                 break;
             default:
                 break;
         }
-        return new SequentialTransition(tr,pr);
+        return new SequentialTransition(tr);
+    }
+
+    private void selectionSortAnimated() {
+        int min_id;
+        int n = dataNodes.size();
+
+        // label initialization
+        Label iLabel = new Label("i");
+        iLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 12));
+        iLabel.setTextFill(Color.RED);
+
+        iLabel.setLayoutX(dataNodes.getFirst().getX() + 10);
+        iLabel.setLayoutY(arrayY - 15);
+        Label jLabel = new Label("j");
+        jLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 12));
+        jLabel.setTextFill(Color.GREEN);
+        jLabel.setLayoutX(dataNodes.getFirst().getX() + NODEWIDTH / 2);
+        jLabel.setLayoutY(arrayY - 15);
+        VisualPage.getAnimationPane().getChildren().addAll(iLabel, jLabel);
+        SequentialTransition master = new SequentialTransition();
+        for (int i = 0; i < n; i++) {
+            if (i > 0) {
+                master.getChildren().add(moveLabel(iLabel, NODEWIDTH + 10, 1));
+                master.getChildren().add(moveLabel(jLabel, (n - i-1) * (NODEWIDTH + 10), -1));
+            }
+            min_id = i;
+            master.getChildren().add(animateColorChange(dataNodes.get(min_id), Color.ORANGE));
+            for (int j = i + 1; j < n; ++j) {
+                master.getChildren().add(moveLabel(jLabel, NODEWIDTH + 10, 1));
+                master.getChildren().add(animateColorChange(dataNodes.get(j), Color.SKYBLUE));
+                if (dataNodes.get(j).getElement() < dataNodes.get(min_id).getElement()) {
+
+                    master.getChildren().add(animateColorChange(dataNodes.get(min_id), Color.SKYBLUE));
+                    min_id = j;
+                    master.getChildren().add(animateColorChange(dataNodes.get(min_id), Color.ORANGE));
+                }
+                
+            }
+            if (min_id != i) {
+                master.getChildren().add(animateSwap(dataNodes.get(i), dataNodes.get(min_id), min_id - i));
+                ItemNode A = dataNodes.get(i);
+                ItemNode B = dataNodes.get(min_id);
+                Collections.swap(dataNodes, i, min_id);
+                final int ii = i;
+                final int mins = min_id;
+                PauseTransition pause = new PauseTransition(Duration.millis(10));
+                pause.setOnFinished(e -> {
+                    A.setIndex(mins);
+                    B.setIndex(ii);
+                });
+                master.getChildren().add(pause);
+
+            }
+
+            master.getChildren().add(animateColorChange(dataNodes.get(i), Color.LIMEGREEN));
+            for (int k = i + 1; k < n; k++) {
+                master.getChildren().add(animateColorChangeFast(dataNodes.get(k), Color.WHITE));
+            }
+
+        }
+        master.getChildren().add(setColorOfAll(dataNodes, Color.WHITE));
+         PauseTransition labelRemover = new PauseTransition(Duration.seconds(0.01));
+        labelRemover.setOnFinished(e -> {
+            VisualPage.getAnimationPane().getChildren().remove(iLabel);
+            VisualPage.getAnimationPane().getChildren().remove(jLabel);
+        });
+        master.getChildren().add(labelRemover);
+        master.play();
+
     }
 
     private ItemNode duplicateItemNode(ItemNode item) {
