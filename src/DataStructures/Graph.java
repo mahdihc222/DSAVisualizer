@@ -766,6 +766,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     private void highlightCurDfsNode() {
         if(!dfsCallStack.isEmpty()) {
+                    dfsCallStack.getLast().highlight();
                     int cur = dfsCallStack.getLast().getElement();
                     ItemNode curNode = null;
                     for(ItemNode el : dataNodes) {
@@ -779,6 +780,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     private void unHighlightCurDfsNode() {
         if(!dfsCallStack.isEmpty()) {
+                    dfsCallStack.getLast().unHighlight();
                     int cur = dfsCallStack.getLast().getElement();
                     ItemNode curNode = null;
                     for(ItemNode el : dataNodes) {
@@ -792,6 +794,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     private void highlightCurBfsNode() {
         if(!bfsQueue.isEmpty()) {
+                    bfsQueue.getFirst().highlight();
                     int cur = bfsQueue.getFirst().getElement();
                     ItemNode curNode = null;
                     for(ItemNode el : dataNodes) {
@@ -805,6 +808,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     private void unHighlightCurBfsNode() {
         if(!bfsQueue.isEmpty()) {
+                    bfsQueue.getFirst().unHighlight();
                     int cur = bfsQueue.getFirst().getElement();
                     ItemNode curNode = null;
                     for(ItemNode el : dataNodes) {
