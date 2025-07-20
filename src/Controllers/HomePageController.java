@@ -16,6 +16,7 @@ public class HomePageController {
     private List<Button> DSBtnList = new ArrayList<>();
     private List<String> DSList = List.of("List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");
     private List<String> AlgoList = List.of("Dynamic Programming");
+    private List<String> DPAlgoList = List.of("Knapsack");
     public List<Button> DSButtonsCreator(Stage stage){
         for(String ds: DSList){
             DSBtnList.add(createButton(ds,stage));
@@ -40,31 +41,45 @@ public class HomePageController {
         stage.getScene().setRoot(VisualPage.getView(stage, s));
     }
 
-    public Accordion algoArchionCreate(){
+    public Accordion algoArchionCreate(Stage stage){
         Accordion homeAccordion = new Accordion();
 
         for(String as: AlgoList){
-            TitledPane ttlPane = createAlgoTitleBox(as);
+            TitledPane ttlPane = createAlgoTitleBox(as, stage);
             homeAccordion.getPanes().add(ttlPane);
         }
         return homeAccordion;
     }
 
-    private TitledPane createAlgoTitleBox(String s){
+    private TitledPane createAlgoTitleBox(String s, Stage stage){
         TitledPane algoPane = new TitledPane();
         algoPane.setText(s);
         algoPane.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        algoPane.setContent(new VBox(
-            createAlgoButton("Testing")
+        // algoPane.setContent(new VBox(
+        //     createAlgoButton("Testing", stage)
+        // ));
+        if(s.equals("Dynamic Programming")) {
+            algoPane.setContent(new VBox(10, // spacing
+            createAlgoButton("Knapsack", stage), 
+            createAlgoButton("LCS", stage), 
+            createAlgoButton("Sequence Alignment", stage)
         ));
-        
+        }
+
         return algoPane;
     }
 
-    private Button createAlgoButton(String s){
+    private Button createAlgoButton(String s, Stage stage){
         Button btn = new Button(s);
+        btn.setStyle(
+            "-fx-background-color: lightblue;" +    // background color
+            "-fx-border-color: transparent;" +      // no border initially
+            "-fx-font-family: 'Arial';" +            // font family
+            "-fx-font-size: 16px;" +                 // font size
+            "-fx-font-weight: bold;"                 // font weight
+        );
+        btn.setOnAction(e->changeScene(stage, btn.getText()));
         return btn;
     } 
 
-    
 }

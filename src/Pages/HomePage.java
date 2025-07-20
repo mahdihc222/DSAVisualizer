@@ -52,7 +52,7 @@ public class HomePage {
         mainVBox.getChildren().add(AlgoHeading);
         VBox.setMargin(AlgoHeading, new Insets(20,0,0,0));
         mainVBox.getChildren().add(controller.createButton("Sorting",stage));
-        mainVBox.getChildren().add(controller.algoArchionCreate());
+        mainVBox.getChildren().add(controller.algoArchionCreate(stage));
         scrollPane.setContent(centerBox);
     }
 
