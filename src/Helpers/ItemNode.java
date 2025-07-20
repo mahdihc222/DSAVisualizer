@@ -1,4 +1,5 @@
 package Helpers;
+
 import javafx.scene.paint.Color;
 
 import java.util.Objects;
@@ -19,37 +20,35 @@ import javafx.util.Duration;
 public class ItemNode extends Group {
     private Shape boundary;
     private Text text;
-    private Text index=null;
-    private ItemNode prev=null;
-    @SuppressWarnings("unused") //redundant warning, needed later
+    private Text index = null;
+    private ItemNode prev = null;
+    @SuppressWarnings("unused") // redundant warning, needed later
     private boolean isRectangle = true;
-
+    private int elem;
 
     static final int NODEHEIGHT = 40;
     static final int NODEWIDTH = 40;
     static final int NODERADIUS = 20;
-    private final int TEXTSIZE=12; //final int to hold textsize
-    private final String FONTNAME = "Arial"; //final string to hold fontname
-    
-    //constructor to deep copy an itemnode without index
+    private final int TEXTSIZE = 12; // final int to hold textsize
+    private final String FONTNAME = "Arial"; // final string to hold fontname
+
+    // constructor to deep copy an itemnode without index
     // public ItemNode (ItemNode item){
-    //     this.text = new Text(item.text);
+    // this.text = new Text(item.text);
     // }
-    
-    //constructor to create rectangular nodes with index
 
-
-
+    // constructor to create rectangular nodes with index
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
+        this.elem = elem;
         boundary = new Rectangle(nodeX, nodeY, NODEHEIGHT, NODEWIDTH);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
         text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+        text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
         updateTextPosition();
 
         index = new Text(String.valueOf(ind));
-        index.setX(nodeX+boundary.getLayoutBounds().getWidth()/2-index.getLayoutBounds().getWidth());
+        index.setX(nodeX + boundary.getLayoutBounds().getWidth() / 2 - index.getLayoutBounds().getWidth());
         index.setY(getY() + NODEHEIGHT + 15);
         index.setFill(Color.GRAY);
         index.setFont(Font.font(FONTNAME, TEXTSIZE));
@@ -57,9 +56,11 @@ public class ItemNode extends Group {
         this.getChildren().addAll(boundary, text, index);
 
     }
-    //constructor to create rectangular nodes without index
+
+    // constructor to create rectangular nodes without index
     public ItemNode(int elem, int nodeX, int nodeY) {
-        boundary = new Rectangle(nodeX, nodeY, NODEWIDTH,NODEHEIGHT);
+        this.elem = elem;
+        boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
         text = new Text(String.valueOf(elem));
@@ -69,105 +70,108 @@ public class ItemNode extends Group {
         this.getChildren().addAll(boundary, text);
     }
 
-    //this constructor is used to construct circular nodes, which always needs prev link(except root)
-    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle, ItemNode prev){
+    // this constructor is used to construct circular nodes, which always needs prev
+    // link(except root)
+    public ItemNode(int elem, int centerX, int centerY, boolean isRectangle, ItemNode prev) {
+        this.elem = elem;
         this.isRectangle = isRectangle;
         this.prev = prev;
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
-        
+
         text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+        text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
 
         updateTextPosition();
 
-        if(this.prev!=null){
+        if (this.prev != null) {
             Line connectLine = getConnectingLine();
             this.getChildren().add(connectLine);
         }
 
-        this.getChildren().addAll(boundary,text);
+        this.getChildren().addAll(boundary, text);
     }
 
-    public ItemNode(int elem,int centerX, int centerY, boolean isRectangle){
+    public ItemNode(int elem, int centerX, int centerY, boolean isRectangle) {
+        this.elem = elem;
         this.isRectangle = isRectangle;
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
 
-        
         text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME,FontWeight.BOLD,TEXTSIZE));
+        text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
 
         updateTextPosition();
 
-        if(this.prev!=null){
+        if (this.prev != null) {
             Line connectLine = getConnectingLine();
             this.getChildren().add(connectLine);
         }
 
-        this.getChildren().addAll(boundary,text);
+        this.getChildren().addAll(boundary, text);
     }
 
-    //this updateTextPosition places text at proper place
-    private void updateTextPosition(){
-        if(boundary instanceof Circle){
-            text.setX(getX() - text.getLayoutBounds().getWidth()/2);
-            text.setY(getY() + text.getLayoutBounds().getHeight()/4);
-        }
-        else{
+    // this updateTextPosition places text at proper place
+    private void updateTextPosition() {
+        if (boundary instanceof Circle) {
+            text.setX(getX() - text.getLayoutBounds().getWidth() / 2);
+            text.setY(getY() + text.getLayoutBounds().getHeight() / 4);
+        } else {
             text.setX(getX() + NODEWIDTH / 2 - text.getLayoutBounds().getWidth() / 2);
             text.setY(getY() + NODEHEIGHT / 2 + text.getLayoutBounds().getHeight() / 4);
         }
     }
 
-    private void updateIndexPosition(){
-        if(index!=null){
-            index.setX(((Rectangle)boundary).getX()+boundary.getLayoutBounds().getWidth()/2-index.getLayoutBounds().getWidth());
+    private void updateIndexPosition() {
+        if (index != null) {
+            index.setX(((Rectangle) boundary).getX() + boundary.getLayoutBounds().getWidth() / 2
+                    - index.getLayoutBounds().getWidth());
             index.setY(getY() + NODEHEIGHT + 15);
         }
     }
 
-   
-
-    public double getX(){
-        if(boundary instanceof Circle) return ((Circle)boundary).getCenterX();
-        if(boundary instanceof Rectangle) return ((Rectangle)boundary).getX();
-        return -1;
-    }
-    public double getY(){
-        if(boundary instanceof Circle) return ((Circle)boundary).getCenterY();
-        if(boundary instanceof Rectangle) return ((Rectangle)boundary).getY();
+    public double getX() {
+        if (boundary instanceof Circle)
+            return ((Circle) boundary).getCenterX();
+        if (boundary instanceof Rectangle)
+            return ((Rectangle) boundary).getX();
         return -1;
     }
 
-    //function to compare if current Node is less than the passed node
-    public boolean isLessThan(ItemNode other){
-        return this.getElement()<other.getElement();
+    public double getY() {
+        if (boundary instanceof Circle)
+            return ((Circle) boundary).getCenterY();
+        if (boundary instanceof Rectangle)
+            return ((Rectangle) boundary).getY();
+        return -1;
     }
 
+    // function to compare if current Node is less than the passed node
+    public boolean isLessThan(ItemNode other) {
+        return this.getElement() < other.getElement();
+    }
 
-    //function to set or change the location of a node
-    //not tested yet
-    public void setLocation(double x, double y){
-        if(boundary instanceof Circle){
+    // function to set or change the location of a node
+    // not tested yet
+    public void setLocation(double x, double y) {
+        if (boundary instanceof Circle) {
             Circle boun = (Circle) boundary;
             boun.setCenterX(x);
             boun.setCenterY(y);
-            
-        }
-        else{
-            ((Rectangle)boundary).setX(x);
-            ((Rectangle)boundary).setY(y);
+
+        } else {
+            ((Rectangle) boundary).setX(x);
+            ((Rectangle) boundary).setY(y);
         }
         updateTextPosition();
         updateIndexPosition();
     }
 
-    //function to exchange only value of two nodes
-    //nodes will remain in place
-    public void exchangeValueWith(ItemNode other){
+    // function to exchange only value of two nodes
+    // nodes will remain in place
+    public void exchangeValueWith(ItemNode other) {
         String temp = this.text.getText();
         this.text.setText(other.text.getText());
         other.text.setText(temp);
@@ -175,7 +179,7 @@ public class ItemNode extends Group {
         other.updateTextPosition();
     }
 
-    public void setIndex(int ind){
+    public void setIndex(int ind) {
         index.setText(String.valueOf(ind));
     }
 
@@ -186,25 +190,26 @@ public class ItemNode extends Group {
         pause.play();
     }
 
-    public void flashText(Color flashColor){
+    public void flashText(Color flashColor) {
         text.setFill(flashColor);
         PauseTransition pause = new PauseTransition(Duration.seconds(2.0)); // green for 1s
         pause.setOnFinished(e -> text.setFill(Color.BLACK));
         pause.play();
     }
 
-    public void setTextColor(Color newColor){
+    public void setTextColor(Color newColor) {
         text.setFill(newColor);
     }
 
     public void setNodeColor(Color color) {
         boundary.setFill(color);
     }
-    
-    //Returns a Line connecting this node to its previous node.
+
+    // Returns a Line connecting this node to its previous node.
 
     private Line getConnectingLine() {
-        if (this.prev == null) return null;
+        if (this.prev == null)
+            return null;
 
         if (boundary instanceof Circle && prev.boundary instanceof Circle) {
             // Calculate direction vector
@@ -249,8 +254,6 @@ public class ItemNode extends Group {
         return NODEHEIGHT;
     }
 
-
-
     public int hashCode() {
         int x = Integer.parseInt(text.getText());
         return Objects.hash(x);
@@ -268,13 +271,19 @@ public class ItemNode extends Group {
         boundary.setStrokeWidth(1);
     }
 
-
-    public void setElement(int a){
-        text.setText(String.valueOf(a));
+    public void setElement(int a) {
+        elem = a;
+        text.setText(String.valueOf(elem));
         updateTextPosition();
     }
-     public int getElement() {
-        return Integer.parseInt(text.getText());
+
+    public int getElement() {
+        return elem;
+    }
+
+    public void setNodeLayout(double x, double y) {
+        this.setLayoutX(x);
+        this.setLayoutY(y);
     }
 
 }

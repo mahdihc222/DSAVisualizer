@@ -23,7 +23,8 @@ import javafx.util.Duration;
 public class Heap extends DSAbstract<ItemNode> {
     private int currentX, currentY; //current inserting position in animPane
     private Integer index = 1;
-    private int distance = 140;
+    private final int HSPACINGBETWEENNODES = 280;
+    private int levels =1;
     private boolean isMinHeap = true; // by default minimum heap is implemented
     //but user can change to maximum heap
     private ToggleGroup selectionGroup; //to keep track of min or max only one is selected
@@ -51,14 +52,12 @@ public class Heap extends DSAbstract<ItemNode> {
 
     @Override
     protected void showCode() {
-        Tab minHeapTab = new Tab("Min Heap");
-        minHeapTab.setContent(getCodeTextArea("MinHeap"));
-        Tab maxHeapTab = new Tab("Max Heap");
-        maxHeapTab.setContent(getCodeTextArea("MaxHeap"));
+        Tab minHeapTab = new Tab("Min Heap",getCodeTextArea("MinHeap"));
+        Tab maxHeapTab = new Tab("Max Heap",getCodeTextArea("MaxHeap"));
+        minHeapTab.setClosable(false);
+        maxHeapTab.setClosable(false);
         VisualPage.getCodePane().getTabs().add(minHeapTab);
         VisualPage.getCodePane().getTabs().add(maxHeapTab);
-
-        
     }
 
     
@@ -85,21 +84,27 @@ public class Heap extends DSAbstract<ItemNode> {
         isMinHeapButton.setOnAction(e->{
             if(!isMinHeap){
                 isMinHeap=true;
-                dataNodes.clear();
+                
                 VisualPage.getAnimationPane().getChildren().clear();
+                dataNodes.clear();
                 index=1;
+                levels =1;
+                currentX = startingX;
+                currentY = startingY;
+                VisualPage.getCodePane().getSelectionModel().select(0);
             }
         });
 
         isMaxHeapButton.setOnAction(e->{
             if(isMinHeap){
                 isMinHeap=false;
-                dataNodes.clear();
                 VisualPage.getAnimationPane().getChildren().clear();
+                dataNodes.clear();
+                levels =1;
                 index=1;
                 currentX = startingX;
                 currentY = startingY;
-                distance = 140;
+                VisualPage.getCodePane().getSelectionModel().select(1);
             }
         });
         VBox selectionBox = new VBox();
@@ -112,7 +117,7 @@ public class Heap extends DSAbstract<ItemNode> {
 
         pushButton.setOnAction(e -> pushValue(pushField));
         pushField.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.SPACE)
+            if (e.getCode() == KeyCode.ENTER)
                 pushValue(pushField);
         });
         popButton.setOnAction(e -> removeLastNode());
@@ -135,15 +140,16 @@ public class Heap extends DSAbstract<ItemNode> {
     @Override
     protected void addNode(int val) {
         if (Integer.highestOneBit(index) == index && index > 1) {
-            currentY += 40;
-            if (distance > 20)
-                distance -= 30;
+            currentY += 100;
+            levels++;
         }
         if (index > 1) {
+            double offset = (HSPACINGBETWEENNODES * Math.pow(0.6, levels));
+
             if (index % 2 == 0)
-                currentX = (int) (dataNodes.get(index / 2 - 1).getX() - distance);
+                currentX = (int) (dataNodes.get(index / 2 - 1).getX() - offset);
             else
-                currentX = (int) (dataNodes.get(index / 2 - 1).getX() + distance);
+                currentX = (int) (dataNodes.get(index / 2 - 1).getX() + offset);
         }
         int parentIndex;
         if (index == 1)
