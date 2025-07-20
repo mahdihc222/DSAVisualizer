@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import Pages.VisualPage;
 import javafx.scene.Node;
 
 import javafx.scene.control.TextArea;
@@ -24,6 +25,13 @@ abstract public class DSAbstract<T> {
     abstract protected void addNode(int val);
 
     abstract protected void removeLastNode();
+
+
+    protected void clear(){
+        dataNodes.clear();
+        VisualPage.getAnimationPane().getChildren().clear();
+
+    }
 
     protected TextArea getCodeTextArea(String title){
         String code = "Code not found";

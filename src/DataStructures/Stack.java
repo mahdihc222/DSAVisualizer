@@ -35,8 +35,7 @@ public class Stack extends DSAbstract<ItemNode> {
         Tab llStackTab = new Tab("Linked List Stack");
         llStackTab.setContent(getCodeTextArea("ListStack"));
         VisualPage.getCodePane().getTabs().add(llStackTab);
-
-
+        VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
     }
 
     @Override

@@ -15,14 +15,14 @@ import javafx.stage.Stage;
 public class HomePageController {
     private List<Button> DSBtnList = new ArrayList<>();
     private List<String> DSList = List.of("List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");
-    private List<String> AlgoList = List.of("Sorting","Linked Lists","Divide and Conquer","Dynamic Programming","Greedy Algorithm","Graph Algorithms");
+    private List<String> AlgoList = List.of("Dynamic Programming");
     public List<Button> DSButtonsCreator(Stage stage){
         for(String ds: DSList){
             DSBtnList.add(createButton(ds,stage));
         }
         return DSBtnList;
     }
-    private Button createButton(String s, Stage stage){
+    public Button createButton(String s, Stage stage){
         Button btn = new Button(s);
         btn.setStyle(
             "-fx-background-color: lightblue;" +    // background color

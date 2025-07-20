@@ -4,6 +4,7 @@ import Controllers.HomePageController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -46,9 +47,11 @@ public class HomePage {
 
         AlgoHeading = new Label("Algorithms");
         AlgoHeading.setFont(Font.font("Arial",FontWeight.BOLD, 36));
+
+        
         mainVBox.getChildren().add(AlgoHeading);
         VBox.setMargin(AlgoHeading, new Insets(20,0,0,0));
-
+        mainVBox.getChildren().add(controller.createButton("Sorting",stage));
         mainVBox.getChildren().add(controller.algoArchionCreate());
         scrollPane.setContent(centerBox);
     }

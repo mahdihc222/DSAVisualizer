@@ -108,16 +108,17 @@ public class Graph extends DSAbstract<ItemNode> {
 
     // }
 
-    public String getCode() {
-        return "not implemented yet.";
-    }
 
     @Override
     protected void showCode(){
         Tab dfsTab = new Tab("DFS");
         Tab bfsTab = new Tab("BFS");
 
+        //dfsTab.setContent(getCodeTextArea("DFS"));
         //call getCodeTextArea with appropriate titles
+       // VisualPage.getCodePane().getTabs().add(dfsTab);
+        //VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+
     }
 
     @Override
@@ -584,7 +585,7 @@ public class Graph extends DSAbstract<ItemNode> {
 
     @Override
     protected void removeLastNode() {
-
+        //Not needed here
     }
 
     void addGraphEdge(TextField t1, TextField t2) {

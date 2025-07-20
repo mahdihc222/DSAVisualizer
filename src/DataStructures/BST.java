@@ -1,6 +1,7 @@
 package DataStructures;
 
 import java.util.LinkedHashMap;
+import java.util.Random;
 import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import Helpers.ItemNode;
@@ -60,7 +61,12 @@ public class BST extends DSAbstract<ItemNode> {
         Button removeButton = new Button("Remove");
         HBox popRow = new HBox(10, removeField, removeButton);
 
-        VBox pushPopBox = new VBox(20, pushRow, popRow);
+        Button generateRandomButton = new Button("Generate Random BST");
+        generateRandomButton.setOnAction(e->generateRandomBST());
+
+        Button clearButton = new Button("Clear");
+        clearButton.setOnAction(e->clear());
+        VBox pushPopBox = new VBox(10, pushRow, popRow,generateRandomButton,clearButton);
 
         TextField searchField = new TextField();
         searchField.setPromptText("Enter value");
@@ -113,6 +119,8 @@ public class BST extends DSAbstract<ItemNode> {
         Tab bstTab = new Tab("BST");
         bstTab.setContent(getCodeTextArea("BST"));
         VisualPage.getCodePane().getTabs().add(bstTab);
+        VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+
     }
 
     private void insertValue(TextField pushField) {
@@ -120,7 +128,8 @@ public class BST extends DSAbstract<ItemNode> {
         if (!input.isEmpty()) {
             try {
                 int value = Integer.parseInt(input);
-                addNode(value);
+                if(findNodeWithValue(value)==null)
+                    addNode(value);
                 pushField.clear();
             } catch (NumberFormatException ex) {
                 return;
@@ -139,6 +148,13 @@ public class BST extends DSAbstract<ItemNode> {
                 return;
             }
         }
+    }
+
+    @Override
+    protected void clear(){
+        super.clear();
+        map.clear();
+        root = null;
     }
 
     private void findHeight() {
@@ -586,6 +602,14 @@ public class BST extends DSAbstract<ItemNode> {
     @Override
     protected void removeLastNode() {
         // This function needs no implementation for BST
+    }
+
+    private void generateRandomBST(){
+        Random r = new Random();
+
+        for(int i=0; i<8;i++){
+            addNode(r.nextInt(98)+1);
+        }
     }
 
 }
