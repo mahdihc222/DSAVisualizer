@@ -114,7 +114,7 @@ public class VisualPage {
         animationPane.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.5));
         animationPane.prefHeightProperty().bind(rootPane.heightProperty());
 
-        controlBox = new VBox();
+        controlBox = new VBox(10); // vertical gap between buttons
         controlPane = new AnchorPane();
         controlPane.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.5));
         controlPane.prefHeightProperty().bind(rootPane.heightProperty().multiply(0.35));
@@ -153,10 +153,15 @@ public class VisualPage {
             ds = new Graph();
         } else if (s.equals("List")) {
             ds = new MyList();
+        }  else if(s.equals("Queue")) {
+            ds = new Queue();
         }
 
         else if(s.equals("Sorting")){
             new Sorting();
+        }
+        else if(s.equals("Knapsack")) {
+            ds = new Algorithms.DP.Knapsack();
         }
 
         return root;

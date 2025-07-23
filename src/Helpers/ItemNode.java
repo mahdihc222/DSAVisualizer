@@ -37,6 +37,16 @@ public class ItemNode extends Group {
     // this.text = new Text(item.text);
     // }
 
+    public ItemNode(String s, int nodeX, int nodeY) {
+        text.setText(s);
+        boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
+        boundary.setFill(Color.WHITE);
+        boundary.setStroke(Color.BLACK);
+        updateTextPosition();
+
+        this.getChildren().addAll(boundary, text);
+    }
+
     // constructor to create rectangular nodes with index
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
         this.elem = elem;
@@ -260,7 +270,11 @@ public class ItemNode extends Group {
     }
 
     public void highlight() {
-        boundary.setStrokeWidth(6);
+
+        if(boundary instanceof Circle){
+            boundary.setStrokeWidth(6);
+        }
+        else boundary.setStrokeWidth(3);
     }
 
     public void unHighlight() {

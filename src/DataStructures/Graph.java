@@ -13,7 +13,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
@@ -22,29 +24,31 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Stack;
+import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Graph extends DSAbstract<ItemNode> {
     List<Edge> edges = new ArrayList<>();
+    List<Label> labels = new ArrayList<>();
 
     Map<ItemNode, List<ItemNode>> adj = new TreeMap<>(
         Comparator.comparingInt(ItemNode::getElement)
     );
+    Label adjListLabel = new Label("Adjacency Lists:");
+
     int nodeCount = 0;
     boolean isDirected = false;
     ToggleGroup selectionGroup;
     int centerX = 250;
-    int centerY = 200;
+    int centerY = 180;
     int radius = 150;
 
     List<ItemNode> isGry = new ArrayList<>();
@@ -56,16 +60,18 @@ public class Graph extends DSAbstract<ItemNode> {
     boolean dfsIsPaused = false;
     int curDfsIdx = -1;
     List<ItemNode> dfsCallStack = new ArrayList<>();
-    int stackX = 600;
+    int stackX = 550;
     int stackY = 350;
+    Label dfsStackLabel = new Label("DFS Call Stack");
 
-    // bfs
+    // bfs 
     List<ItemNode> bfsOrder = new ArrayList<>();
     boolean bfsIsPaused = false;
     int curBfsIdx = -1;
     List<ItemNode> bfsQueue =  new ArrayList<>();
-    int queueX = 100;
-    int queueY = 400;
+    int queueX = 250;
+    int queueY = 380;
+    Label bfsQueueLabel = new Label("BFS Queue");
 
     HashMap<ItemNode, Boolean> vis = new HashMap<>();
 
@@ -74,9 +80,22 @@ public class Graph extends DSAbstract<ItemNode> {
         initializeControls();
         //VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
-        VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
-        VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
-        VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
+        // VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        // VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
+        // VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
+        dfsStackLabel.setLayoutX(stackX - 30); dfsStackLabel.setLayoutY(stackY + 50);
+        dfsStackLabel.setVisible(false);
+        dfsStackLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+
+        bfsQueueLabel.setLayoutX(160); bfsQueueLabel.setLayoutY(queueY );
+        bfsQueueLabel.setVisible(false);
+        bfsQueueLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+
+        adjListLabel.setLayoutX(10); adjListLabel.setLayoutY(420);
+        adjListLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+
+        labels.add(adjListLabel); labels.add(dfsStackLabel); labels.add(bfsQueueLabel);
+        VisualPage.getAnimationPane().getChildren().addAll(labels);
     }
 
     // public Graph(boolean isDirected) {
@@ -166,7 +185,34 @@ public class Graph extends DSAbstract<ItemNode> {
         addEdgeButton.setOnAction(e -> addGraphEdge(edgeNodeField1, edgeNodeField2));
         removeEdgeButton.setOnAction(e -> removeGraphEdge(edgeNodeField1, edgeNodeField2));
 
+        VBox randBox = new VBox();
+        Button randButton = new Button("Generate Random Graph");
+        randBox.getChildren().addAll(randButton);
+        VBox.setMargin(randButton, new Insets(0, 0, 15, 0));
+
+        Controls.add(randBox);
         Controls.add(totalBox);
+
+        randButton.setOnAction(e->{
+            Random random = new Random();
+            List<Integer> rem = new ArrayList<>();
+            for(ItemNode node : dataNodes) rem.add(node.getElement());
+            for(int i : rem) removeNode(i);
+
+            int targetEdges = (int) (10);
+            for(int i = 0; i < targetEdges; ++i) {
+                int n1 = random.nextInt(8) + 1;
+                int n2 = random.nextInt(8) + 1;
+                if(n1 == n2) {
+                    i--; 
+                }
+                else if(!addEdge(n1, n2)) {
+                    i--;
+                }
+            }
+            refresh();
+        });
+
         TextField dfsField = new TextField();
         dfsField.setPromptText("Starting node:");
         Button startDFSbutton = new Button("Start DFS");
@@ -378,6 +424,7 @@ public class Graph extends DSAbstract<ItemNode> {
     private void animateDFS(ItemNode node) {
 
         getDfsOrder(node, dfsOrder);
+        dfsStackLabel.setVisible(true);
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             if (curDfsIdx < dfsOrder.size()) {
@@ -400,6 +447,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 }
             } else {
                 timeline.stop(); // end of animation
+                dfsStackLabel.setVisible(false);
                 for (ItemNode el : dataNodes) {
                     el.setNodeColor(Color.WHITE);
                     el.setTextColor(Color.BLACK);
@@ -418,6 +466,7 @@ public class Graph extends DSAbstract<ItemNode> {
     private void animateBFS(ItemNode node) {
 
         getBfsOrder(node, bfsOrder);
+        bfsQueueLabel.setVisible(true);
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             if (curBfsIdx < bfsOrder.size()) {
@@ -438,7 +487,8 @@ public class Graph extends DSAbstract<ItemNode> {
                     refresh();
                 }
             } else {
-                timeline.stop(); // end of animation
+                timeline.stop();
+                bfsQueueLabel.setVisible(false);
                 for (ItemNode el : dataNodes) {
                     el.setNodeColor(Color.WHITE);
                     el.setTextColor(Color.BLACK);
@@ -600,13 +650,29 @@ public class Graph extends DSAbstract<ItemNode> {
         refresh();
     }
 
-    void addEdge(ItemNode n1, ItemNode n2) {
-        edges.add(new Edge(n1, n2, isDirected));
+    boolean addEdge(ItemNode n1, ItemNode n2) {
+        for(Edge ed : edges) {
+            if(ed.connects(n1, n2)) return false;
+        }
+
+        edges.add(new Edge(n1, n2, isDirected, true));
         refresh();
 
         adj.get(n1).add(n2);
         if (!isDirected)
             adj.get(n2).add(n1);
+        return true;
+    }
+
+    boolean addEdge(int n1, int n2) {
+        addNode(n1); addNode(n2);
+        ItemNode node1 = null;
+        ItemNode node2 = null;
+        for(ItemNode node : dataNodes) {
+            if(node.getElement() == n1) node1 = node;
+            if(node.getElement() == n2) node2 = node;
+        }
+        return addEdge(node1, node2);
     }
 
     void refresh() {
@@ -615,6 +681,8 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().addAll(edges);
         VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
         VisualPage.getAnimationPane().getChildren().addAll(bfsQueue);
+        VisualPage.getAnimationPane().getChildren().addAll(labels);
+        displayAdjList();
         highlightCurBfsNode();
     }
 
@@ -746,6 +814,31 @@ public class Graph extends DSAbstract<ItemNode> {
                     }
                     curNode.unHighlight();
                 }
+    }
+
+    void displayAdjList() {
+        List<Node> foo = new ArrayList<>();
+        int x = 50;
+        int y = 450;
+        int c = 0;
+        for(ItemNode key : adj.keySet()) {
+            int listX = x;
+            int listY = y + c * 50;
+            ItemNode node = new ItemNode(key.getElement(), listX, listY);
+            node.highlight();
+            ItemNode prev = node;
+            foo.add(node);
+            for(ItemNode neigh : adj.get(key)) {
+                listX += 70;
+                ItemNode next = new ItemNode(neigh.getElement(), listX, listY);
+                Edge ed = new Edge(prev, next, true, false);
+                foo.add(ed);
+                foo.add(next);
+                prev = next;
+            }
+            c++;
+        }
+        VisualPage.getAnimationPane().getChildren().addAll(foo);
     }
 
 }
