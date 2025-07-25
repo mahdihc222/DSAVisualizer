@@ -123,6 +123,9 @@ public class Graph extends DSAbstract<ItemNode> {
 
     @Override
     protected void initializeControls() {
+        VisualPage.getAnimationPane().getChildren().clear();
+        VisualPage.getControlBox().getChildren().clear();
+
         Button addNodeButton = new Button("Add node");
         TextField nodeField = new TextField();
         nodeField.setPrefWidth(100);

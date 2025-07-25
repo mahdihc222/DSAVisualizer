@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.plaf.basic.BasicSeparatorUI;
-
 import DataStructures.DSAbstract;
 import Helpers.ItemNode;
 import Pages.VisualPage;
@@ -52,6 +50,9 @@ public class Knapsack extends DSAbstract<ItemNode> {
     Text dpText = new Text(200, 200, "");
     boolean animIsPaused = false;
 
+    Text anim_i = new Text(100 ,350, "i");
+    Text anim_j = new Text(20, 460, "j");
+
     public Knapsack() {
         System.out.println("in constuctor");
         initializeControls();
@@ -67,6 +68,9 @@ public class Knapsack extends DSAbstract<ItemNode> {
 
     @Override
     protected void initializeControls() {
+        VisualPage.getAnimationPane().getChildren().clear();
+        VisualPage.getControlBox().getChildren().clear();
+        dpText.setFont(Font.font("System", FontWeight.BOLD, 18));
 
         Button randButton = new Button("Generate random");
         Button startButton = new Button("Start");
@@ -75,6 +79,7 @@ public class Knapsack extends DSAbstract<ItemNode> {
         Button prevButton = new Button("Previous");
         Button nexButton = new Button("Next");
         ComboBox<String> speedBox = new ComboBox<>();
+        anim_i.setFill(Color.BLUE); anim_j.setFill(Color.RED);
 
         HBox animControlBox = new HBox(10);
         animControlBox.getChildren().addAll(startButton, pauseButton, resmeButton, prevButton, nexButton, speedBox);
@@ -102,6 +107,8 @@ public class Knapsack extends DSAbstract<ItemNode> {
         startButton.setOnAction(e -> {
             drawTable();
             getSteps();
+            VisualPage.getAnimationPane().getChildren().addAll(anim_i);
+            VisualPage.getAnimationPane().getChildren().addAll(anim_j);
             System.out.println(curNode.size());
             timeline = new Timeline(new KeyFrame(Duration.seconds(delay), er -> {
                 if (curAnimationIdx < curNode.size()) {
@@ -109,7 +116,11 @@ public class Knapsack extends DSAbstract<ItemNode> {
 
                 } else {
                     timeline.stop(); // end of animation
-
+                    valueNodes.getLast().setNodeColor(Color.WHITE);
+                    weightNodes.getLast().setNodeColor(Color.WHITE);
+                    curNode.getLast().setNodeColor(Color.WHITE);
+                    prevNodeCase1.getLast().setNodeColor(Color.WHITE);
+                    prevNodeCase2.getLast().setNodeColor(Color.WHITE);
                 }
             }));
             timeline.setCycleCount(Animation.INDEFINITE);
@@ -129,11 +140,13 @@ public class Knapsack extends DSAbstract<ItemNode> {
         });
 
         prevButton.setOnAction(e -> {
-            revCurIdx();
+            if (animIsPaused)
+                revCurIdx();
         });
 
         nexButton.setOnAction(e -> {
-            playCurIdx();
+            if (animIsPaused)
+                playCurIdx();
         });
 
         speedBox.getItems().addAll("0.5x", "1x", "2x");
@@ -182,12 +195,25 @@ public class Knapsack extends DSAbstract<ItemNode> {
         if (curAnimationIdx > W && curAnimationIdx % (W + 1) == 0) {
             valueNodes.get(curAnimationIdx / (1 + W) - 1).setNodeColor(Color.WHITE);
             weightNodes.get(curAnimationIdx / (1 + W) - 1).setNodeColor(Color.WHITE);
+
+            update_anim_j("y", anim_j.getY() + 40);
+            update_anim_i("x", 100);
         }
 
-        curNode.get(curAnimationIdx).flash(Color.ORANGE);
-        prevNodeCase1.get(curAnimationIdx).flash(Color.YELLOW);
+        if(curAnimationIdx > 0) {
+            curNode.get(curAnimationIdx-1).setNodeColor(Color.WHITE);
+            prevNodeCase1.get(curAnimationIdx-1).setNodeColor(Color.WHITE);
+            if (prevNodeCase2.get(curAnimationIdx-1) != null) 
+            prevNodeCase2.get(curAnimationIdx-1).setNodeColor(Color.WHITE);
+
+            if(curAnimationIdx % (W + 1) != 0)
+            update_anim_i("x", anim_i.getX() + 40);
+        }
+
+        curNode.get(curAnimationIdx).setNodeColor(Color.ORANGE);
+        prevNodeCase1.get(curAnimationIdx).setNodeColor(Color.YELLOW);
         if (prevNodeCase2.get(curAnimationIdx) != null) {
-            prevNodeCase2.get(curAnimationIdx).flash(Color.YELLOW);
+            prevNodeCase2.get(curAnimationIdx).setNodeColor(Color.YELLOW);
         }
 
         VisualPage.getAnimationPane().getChildren().remove(dpText);
@@ -197,9 +223,12 @@ public class Knapsack extends DSAbstract<ItemNode> {
                         "\n\nTaking current element:\n" +
                         (prevNodeCase2.get(curAnimationIdx) == null ? "Not possible"
                                 : "dp[i-1][j-w[i]] + val[i] = " +
+                                    prevNodeCase2.get(curAnimationIdx).getElement() + " + " +
+                                        values.get(curAnimationIdx / (1 + W)) + " = " +
                                         (prevNodeCase2.get(curAnimationIdx).getElement()
                                                 + values.get(curAnimationIdx / (1 + W)))));
         VisualPage.getAnimationPane().getChildren().addAll(dpText);
+        
 
         int ansc1 = prevNodeCase1.get(curAnimationIdx).getElement();
         int ansc2 = 0;
@@ -214,6 +243,12 @@ public class Knapsack extends DSAbstract<ItemNode> {
             return;
 
         curNode.get(curAnimationIdx).setElement(0);
+        if(curAnimationIdx > 0) {
+            curNode.get(curAnimationIdx).setNodeColor(Color.WHITE);
+            prevNodeCase1.get(curAnimationIdx).setNodeColor(Color.WHITE);
+            if(prevNodeCase2.get(curAnimationIdx) != null) 
+            prevNodeCase2.get(curAnimationIdx).setNodeColor(Color.WHITE);
+        }
 
         if (curAnimationIdx > W && curAnimationIdx % (W + 1) == 0) {
             valueNodes.get(curAnimationIdx / (1 + W)).setNodeColor(Color.WHITE);
@@ -222,6 +257,27 @@ public class Knapsack extends DSAbstract<ItemNode> {
             valueNodes.get(curAnimationIdx / (1 + W) - 1).setNodeColor(Color.WHEAT);
             weightNodes.get(curAnimationIdx / (1 + W) - 1).setNodeColor(Color.WHEAT);
         }
+
+        if (curAnimationIdx > W && curAnimationIdx % (W + 1) == 0) {
+            update_anim_j("y", anim_j.getY() - 40);
+            update_anim_i("x", 100 + W * 40 );
+        }
+        if (curAnimationIdx-1 > W && (curAnimationIdx-1) % (W + 1) == 0) {
+            update_anim_j("y", anim_j.getY() - 40);
+            update_anim_i("x", 100 + W * 40 );
+        }
+
+        if(curAnimationIdx > 0) {
+            if(curAnimationIdx % (W + 1) != 0)
+            update_anim_i("x", anim_i.getX() - 40);
+        }
+        if(curAnimationIdx-1 > 0) {
+            if((curAnimationIdx-1) % (W + 1) != 0)
+            update_anim_i("x", anim_i.getX() - 40);
+        }
+
+
+
 
         curAnimationIdx -= 2;
         playCurIdx();
@@ -241,6 +297,20 @@ public class Knapsack extends DSAbstract<ItemNode> {
     protected void removeLastNode() {
         // TODO Auto-generated method stub
 
+    }
+
+    void update_anim_i(String axis, double targ){
+        VisualPage.getAnimationPane().getChildren().remove(anim_i);
+        if(axis.equals("x")) anim_i.setX(targ);
+        else anim_i.setY(targ);
+        VisualPage.getAnimationPane().getChildren().addAll(anim_i);
+    }
+
+    void update_anim_j(String axis, double targ){
+        VisualPage.getAnimationPane().getChildren().remove(anim_j);
+        if(axis.equals("x")) anim_j.setX(targ);
+        else anim_j.setY(targ);
+        VisualPage.getAnimationPane().getChildren().addAll(anim_j);
     }
 
     @Override

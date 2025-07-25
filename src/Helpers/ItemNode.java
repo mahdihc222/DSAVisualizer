@@ -19,7 +19,7 @@ import javafx.util.Duration;
 //Dont use other nodes, use this node class and specify type in constructor
 public class ItemNode extends Group {
     private Shape boundary;
-    private Text text;
+    private Text text; 
     private Text index = null;
     private ItemNode prev = null;
     @SuppressWarnings("unused") // redundant warning, needed later
@@ -38,7 +38,7 @@ public class ItemNode extends Group {
     // }
 
     public ItemNode(String s, int nodeX, int nodeY) {
-        text.setText(s);
+        text = new Text(s); text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
         boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
@@ -53,7 +53,7 @@ public class ItemNode extends Group {
         boundary = new Rectangle(nodeX, nodeY, NODEHEIGHT, NODEWIDTH);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
-        text = new Text(String.valueOf(elem));
+        text = new Text(String.valueOf(elem)); 
         text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
         updateTextPosition();
 
@@ -73,8 +73,8 @@ public class ItemNode extends Group {
         boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
-        text = new Text(String.valueOf(elem));
-        text.setFont(Font.font(FONTNAME, TEXTSIZE));
+        text = new Text(String.valueOf(elem)); 
+        text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
         updateTextPosition();
 
         this.getChildren().addAll(boundary, text);
@@ -90,7 +90,7 @@ public class ItemNode extends Group {
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
 
-        text = new Text(String.valueOf(elem));
+        text = new Text(String.valueOf(elem)); 
         text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
 
         updateTextPosition();
@@ -110,7 +110,7 @@ public class ItemNode extends Group {
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
 
-        text = new Text(String.valueOf(elem));
+        text = new Text(String.valueOf(elem)); 
         text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
 
         updateTextPosition();
@@ -265,8 +265,7 @@ public class ItemNode extends Group {
     }
 
     public int hashCode() {
-        int x = Integer.parseInt(text.getText());
-        return Objects.hash(x);
+        return text.getText().hashCode();
     }
 
     public void highlight() {
