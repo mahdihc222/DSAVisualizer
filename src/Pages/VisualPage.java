@@ -163,6 +163,9 @@ public class VisualPage {
         else if(s.equals("Knapsack")) {
             ds = new Algorithms.DP.Knapsack();
         }
+        else if(s.equals("LCS")) {
+            ds = new Algorithms.DP.LCS();
+        }
 
         return root;
     }
