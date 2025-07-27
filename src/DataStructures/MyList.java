@@ -1,5 +1,8 @@
 package DataStructures;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.animation.PauseTransition;
@@ -12,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 public class MyList extends DSAbstract<ItemNode> {
 
@@ -19,14 +23,23 @@ public class MyList extends DSAbstract<ItemNode> {
     private final int NODEWIDTH=40;
     private int currentIndex;
     private int startingX;
+    private int sllY;
+    private int dllY;
     private int offsetY;
     private Line currentIndexIndicator;
     private final int INDICATORHEIGHT = 50;
+    private List<Pair<ItemNode,Line>> SLLNodes;
+    private List<Pair<ItemNode,Pair<Line,Line>>> DLLNodes;
+    
     public MyList(){
         super();
         startingX = lastX = 50;
         currentY = 100;
+        sllY = 400;
+        dllY=700;
         currentIndex = 0;
+        SLLNodes = new ArrayList<>();
+        DLLNodes = new ArrayList<>();
         initializeControls();
         
         VisualPage.getControlBox().getChildren().addAll(Controls);

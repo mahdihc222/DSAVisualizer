@@ -27,17 +27,24 @@ public class Heap extends DSAbstract<ItemNode> {
     private int levels =1;
     private boolean isMinHeap = true; // by default minimum heap is implemented
     //but user can change to maximum heap
+    private Label returnLabel;
     private ToggleGroup selectionGroup; //to keep track of min or max only one is selected
     public Heap() {
         super();
         currentX = startingX = 250;
         currentY = startingY = 100;
         selectionGroup = new ToggleGroup();
+        returnLabel = new Label("Returned: ");
+        returnLabel.setFont(new Font("Consolas",14));
+        returnLabel.setLayoutX(5);
+        returnLabel.setLayoutY(5);
+        returnLabel.setVisible(false);
         initializeControls();
         //VisualPage.getCodeBox().setText(getCode());
         showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        VisualPage.getAnimationPane().getChildren().add(returnLabel);
     }
 
     public Heap(boolean isMaxHeap) {
@@ -203,7 +210,7 @@ public class Heap extends DSAbstract<ItemNode> {
                     if (i.get() % 2 == 1)
                         parentIndex.set(i.get() / 2); // for odd parent is at /2
                     else
-                        parentIndex.set((i.get() - 1) / 2); // for even, parent is at (i-1)/2, i.e. for node
+                        parentIndex.set((i.get()-1) / 2); // for even, parent is at (i-1)/2, i.e. for node
                     PauseTransition pause = new PauseTransition(Duration.seconds(0.2));
                     pause.setOnFinished(ev -> {
                         runHeapifyStep(i, parentIndex);
@@ -234,14 +241,17 @@ public class Heap extends DSAbstract<ItemNode> {
         pause.setOnFinished(e -> {
             if (dataNodes.size() > 1)
                 dataNodes.getLast().exchangeValueWith(dataNodes.getFirst());
-            dataNodes.removeLast();
+            
             VisualPage.getAnimationPane().getChildren().clear();
-            Label returnLabel = new Label("Returned: "+popped);
-            returnLabel.setFont(new Font("Consolas",14));
-            returnLabel.setLayoutX(5);
-            returnLabel.setLayoutY(5);
+            //VisualPage.getAnimationPane().getChildren().remove(returnLabel);
+            dataNodes.removeLast();
+            
             VisualPage.getAnimationPane().getChildren().setAll(dataNodes);
+            returnLabel.setText("Returned: "+popped);
+            returnLabel.setVisible(true);
             VisualPage.getAnimationPane().getChildren().add(returnLabel);
+
+            
             index--;
             if (dataNodes.size() > 1)
                 fixHeap(new AtomicInteger(0));
