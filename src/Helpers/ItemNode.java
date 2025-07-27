@@ -264,9 +264,9 @@ public class ItemNode extends Group {
         return NODEHEIGHT;
     }
 
-    public int hashCode() {
-        return text.getText().hashCode();
-    }
+    // public int hashCode() {
+    //     return text.getText().hashCode();
+    // }
 
     public void highlight() {
 

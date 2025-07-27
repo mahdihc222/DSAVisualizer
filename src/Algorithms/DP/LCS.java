@@ -222,18 +222,21 @@ public class LCS extends DSAbstract<ItemNode> {
 
     void reconstruct() {
         curNode.clear();
-
+        getReconstructNodes();
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), er -> {
             if (curAnimationIdx < curNode.size() - 1) {
                 playCurIdx();
 
             } else {
-                // add reconstruction code here
                 
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.playFromStart();
+
+    }
+    
+    void getReconstructNodes() {
 
     }
 
@@ -287,6 +290,24 @@ public class LCS extends DSAbstract<ItemNode> {
 
                     }
 
+                }
+            }
+        }
+        List<ItemNode> curReconNode = new ArrayList<>();
+
+        int i = n, j = m; curReconNode.add(table.get(i-1).get(j-1));
+        while(i > 0 && j > 0) {
+            if(input1.charAt(i-1) == input2.charAt(j-1)) {
+                
+
+                i--; j--; 
+            }
+            else {
+                if(dp[i-1][j] > dp[i][j-1]) {
+                    i--;
+                }
+                else {
+                    j--;
                 }
             }
         }
