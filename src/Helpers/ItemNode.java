@@ -1,9 +1,6 @@
 package Helpers;
 
 import javafx.scene.paint.Color;
-
-import java.util.Objects;
-
 import javafx.animation.PauseTransition;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
@@ -31,11 +28,6 @@ public class ItemNode extends Group {
     static final int NODERADIUS = 20;
     private final int TEXTSIZE = 12; // final int to hold textsize
     private final String FONTNAME = "Arial"; // final string to hold fontname
-
-    // constructor to deep copy an itemnode without index
-    // public ItemNode (ItemNode item){
-    // this.text = new Text(item.text);
-    // }
 
     public ItemNode(String s, int nodeX, int nodeY) {
         text = new Text(s); text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
@@ -79,6 +71,7 @@ public class ItemNode extends Group {
 
         this.getChildren().addAll(boundary, text);
     }
+
 
     // this constructor is used to construct circular nodes, which always needs prev
     // link(except root)
@@ -182,9 +175,12 @@ public class ItemNode extends Group {
     // function to exchange only value of two nodes
     // nodes will remain in place
     public void exchangeValueWith(ItemNode other) {
-        String temp = this.text.getText();
-        this.text.setText(other.text.getText());
-        other.text.setText(temp);
+        //String temp = this.text.getText();
+        int tempint = this.getElement();
+       // this.text.setText(other.text.getText());
+        this.setElement(other.getElement());
+        //other.text.setText(temp);
+        other.setElement(tempint);
         this.updateTextPosition();
         other.updateTextPosition();
     }
@@ -265,7 +261,8 @@ public class ItemNode extends Group {
     }
 
     // public int hashCode() {
-    //     return text.getText().hashCode();
+    //     int x = Integer.parseInt(text.getText());
+    //     return Objects.hash(x);
     // }
 
     public void highlight() {
