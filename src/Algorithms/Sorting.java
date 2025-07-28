@@ -692,7 +692,7 @@ public class Sorting extends DSAbstract<ItemNode> {
 
     private SequentialTransition mergeSort(int low, int high, List<ItemNode> prevList, int lvl) {
         if (low == high)
-            return new SequentialTransition(new PauseTransition(Duration.seconds(0.005)));
+            return new SequentialTransition(new PauseTransition(Duration.seconds(0.001)));
         SequentialTransition sq = new SequentialTransition();
         int mid = (low + high) / 2;
         ArrayList<ItemNode> leftNodes = new ArrayList<>();
@@ -760,7 +760,7 @@ public class Sorting extends DSAbstract<ItemNode> {
 
     private SequentialTransition merge(ArrayList<ItemNode> left, ArrayList<ItemNode> right, List<ItemNode> parent) {
 
-        SequentialTransition sq = new SequentialTransition(new PauseTransition(Duration.millis(500)));
+        SequentialTransition sq = new SequentialTransition(new PauseTransition(Duration.millis(100)));
         if (parent.size() == 1)
             return sq;
         int li = 0;
@@ -780,13 +780,13 @@ public class Sorting extends DSAbstract<ItemNode> {
             if (lftNode.getElement() <= rghtNode.getElement()) {
 
                 sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.SKYBLUE));
-                sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement(), rghtNode.getElement()) );
+                sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement()));
                 li++;
                 i++;
             } else {
                 sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.SKYBLUE));
 
-                sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement(), lftNode.getElement()) );
+                sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement()));
                 ri++;
                 i++;
             }
@@ -797,7 +797,7 @@ public class Sorting extends DSAbstract<ItemNode> {
             ItemNode currentNode = parent.get(i);
 
             sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.ORANGE));
-            sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement(), 0));
+            sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement()));
             sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.SKYBLUE));
             li++;
             i++;
@@ -808,7 +808,7 @@ public class Sorting extends DSAbstract<ItemNode> {
             ItemNode currentNode = parent.get(i);
             sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.ORANGE));
             
-            sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement(), 0));
+            sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement()));
             sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.SKYBLUE));
             ri++;
             i++;
@@ -819,8 +819,8 @@ public class Sorting extends DSAbstract<ItemNode> {
         return sq;
     }
 
-    private PauseTransition animateValueSet(ItemNode A, int a, int notTaken) {
-        PauseTransition pr = new PauseTransition(Duration.millis(1));
+    private PauseTransition animateValueSet(ItemNode A, int a) {
+        PauseTransition pr = new PauseTransition(Duration.millis(100));
         pr.setOnFinished(e -> {
             A.setElement(a);
         });
