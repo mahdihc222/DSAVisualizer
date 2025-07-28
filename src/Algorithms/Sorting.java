@@ -2,7 +2,10 @@ package Algorithms;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.text.DefaultEditorKit.PasteAction;
@@ -351,7 +354,7 @@ public class Sorting extends DSAbstract<ItemNode> {
     /* ---------- small helpers ---------- */
 
     private PauseTransition animateColorChangePair(ItemNode n1, ItemNode n2, Color color) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.3));
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(e -> {
             n1.setNodeColor(color);
             n2.setNodeColor(color);
@@ -667,23 +670,37 @@ public class Sorting extends DSAbstract<ItemNode> {
         return it;
     }
 
+    private ItemNode duplicateItemNode(ItemNode item, char side) {
+        System.out.println(item.getX() + " " + item.getY());
+        ItemNode it;
+        if(side == 'l'){
+            it = new ItemNode(item.getElement(), (int) (item.getX() - 10), (int) (item.getY() + 70));
+        }
+        else{
+            it = new ItemNode(item.getElement(), (int) (item.getX() + 10), (int) (item.getY() + 70));
+        }
+        // it.setLayoutX(item.getLayoutX() + item.getTranslateX());
+        // it.setLayoutY(item.getLayoutY() + item.getTranslateY());
+        return it;
+    }
+
     private void animateMergeSort() {
         if (dataNodes.isEmpty())
             return;
-
-        mergeSort(0, dataNodes.size() - 1, dataNodes, 1).play();
+        mergeSort(0, dataNodes.size() - 1, dataNodes, 0).play();
     }
 
     private SequentialTransition mergeSort(int low, int high, List<ItemNode> prevList, int lvl) {
         if (low == high)
-            return new SequentialTransition(new PauseTransition(Duration.seconds(0.001)));
+            return new SequentialTransition(new PauseTransition(Duration.seconds(0.005)));
         SequentialTransition sq = new SequentialTransition();
         int mid = (low + high) / 2;
         ArrayList<ItemNode> leftNodes = new ArrayList<>();
-        for (int i = 0; i <= (mid - low); i++) {
-            leftNodes.add(duplicateItemNode(prevList.get(i)));
+        for (int i = 0; i <= mid; i++) {
+            if(lvl == 0) leftNodes.add(duplicateItemNode(prevList.get(i))); 
+            else leftNodes.add(duplicateItemNode(prevList.get(i), 'l')); 
         }
-        PauseTransition prl = new PauseTransition(Duration.millis(10));
+        PauseTransition prl = new PauseTransition(Duration.millis(50));
         prl.setOnFinished(e -> {
             VisualPage.getAnimationPane().getChildren().addAll(leftNodes);
         });
@@ -691,20 +708,25 @@ public class Sorting extends DSAbstract<ItemNode> {
 
         ParallelTransition moveLefts = new ParallelTransition();
         for (ItemNode it : leftNodes) {
-            TranslateTransition tr = new TranslateTransition(Duration.seconds(0.5), it);
-            tr.setByY(70 * lvl);
-            tr.setByX(-10 * lvl);
+            TranslateTransition tr = new TranslateTransition(Duration.seconds(1), it);
+            System.out.println("current elem : " + it.getElement() + " x: " + it.getX() + " y: " + it.getY()); 
+            
+            tr.setByY(70 );
+            tr.setByX(-10 );
+            System.out.println("after setby. checking if update happens here");
+            System.out.println("current elem : " + it.getElement() + " x: " + it.getX() + " y: " + it.getY());
             moveLefts.getChildren().add(tr);
         }
         sq.getChildren().add(moveLefts);
 
-        sq.getChildren().add(mergeSort(low, mid, leftNodes, lvl + 1));
+        sq.getChildren().add(mergeSort(0, leftNodes.size()-1, leftNodes, lvl + 1));
 
         ArrayList<ItemNode> rightNodes = new ArrayList<>();
-        for (int i = mid + 1 - low; i <= high - low; i++) {
-            rightNodes.add(duplicateItemNode(prevList.get(i)));
+        for (int i = mid + 1; i <= high; i++) {
+            if(lvl == 0) rightNodes.add(duplicateItemNode(prevList.get(i)));
+            else rightNodes.add(duplicateItemNode(prevList.get(i), 'r'));
         }
-        PauseTransition prr = new PauseTransition(Duration.millis(10));
+        PauseTransition prr = new PauseTransition(Duration.millis(50));
         prr.setOnFinished(e -> {
             VisualPage.getAnimationPane().getChildren().addAll(rightNodes);
         });
@@ -712,15 +734,17 @@ public class Sorting extends DSAbstract<ItemNode> {
 
         ParallelTransition moveRights = new ParallelTransition();
         for (ItemNode it : rightNodes) {
-            TranslateTransition tr = new TranslateTransition(Duration.seconds(0.5), it);
-            tr.setByY(70 * lvl);
-            tr.setByX(10 * lvl);
+            TranslateTransition tr = new TranslateTransition(Duration.seconds(1), it);
+            tr.setByY(70 );
+            tr.setByX(10 );
             moveRights.getChildren().add(tr);
 
         }
 
         sq.getChildren().add(moveRights);
-        sq.getChildren().add(mergeSort(mid + 1, high, rightNodes, lvl + 1));
+        sq.getChildren().add(mergeSort(0, rightNodes.size()-1, rightNodes, lvl + 1));
+
+        
 
         sq.getChildren().add(merge(leftNodes, rightNodes, prevList));
         PauseTransition pr = new PauseTransition(Duration.millis(1));
@@ -735,54 +759,57 @@ public class Sorting extends DSAbstract<ItemNode> {
     }
 
     private SequentialTransition merge(ArrayList<ItemNode> left, ArrayList<ItemNode> right, List<ItemNode> parent) {
-        SequentialTransition sq = new SequentialTransition(new PauseTransition(Duration.millis(10)));
+
+        SequentialTransition sq = new SequentialTransition(new PauseTransition(Duration.millis(500)));
         if (parent.size() == 1)
             return sq;
         int li = 0;
         int ri = 0;
         int i = 0;
 
+        List<ItemNode> leftSorted = new ArrayList<>(left);
+        leftSorted.sort(Comparator.comparing(ItemNode::getElement));
+        List<ItemNode> rightSorted = new ArrayList<>(right);
+        rightSorted.sort(Comparator.comparing(ItemNode::getElement));
+
         while (li < left.size() && ri < right.size()) {
-            ItemNode lftNode = left.get(li);
-            ItemNode rghtNode = right.get(ri);
+            ItemNode lftNode = leftSorted.get(li);
+            ItemNode rghtNode = rightSorted.get(ri);
             ItemNode currentNode = parent.get(i);
-            sq.getChildren().add(animateColorChangePair(lftNode, rghtNode, Color.ORANGE));
+            sq.getChildren().add(animateColorChangePair(left.get(li), right.get(ri), Color.ORANGE));
             if (lftNode.getElement() <= rghtNode.getElement()) {
 
-                sq.getChildren().add(animateColorChangePair(lftNode, currentNode, Color.SKYBLUE));
-                sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement()));
-               // currentNode.setElement(lftNode.getElement());
+                sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.SKYBLUE));
+                sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement(), rghtNode.getElement()) );
                 li++;
                 i++;
             } else {
-                sq.getChildren().add(animateColorChangePair(rghtNode, currentNode, Color.SKYBLUE));
+                sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.SKYBLUE));
 
-                sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement()));
-                //currentNode.setElement(rghtNode.getElement());
+                sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement(), lftNode.getElement()) );
                 ri++;
                 i++;
             }
 
         }
         while (li < left.size()) {
-            ItemNode lftNode = left.get(li);
+            ItemNode lftNode = leftSorted.get(li);
             ItemNode currentNode = parent.get(i);
 
-            sq.getChildren().add(animateColorChangePair(lftNode, currentNode, Color.ORANGE));
-            sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement()));
-            // currentNode.setElement(lftNode.getElement());
-            sq.getChildren().add(animateColorChangePair(lftNode, currentNode, Color.SKYBLUE));
+            sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.ORANGE));
+            sq.getChildren().add(animateValueSet(currentNode, lftNode.getElement(), 0));
+            sq.getChildren().add(animateColorChangePair(left.get(li), currentNode, Color.SKYBLUE));
             li++;
             i++;
         }
 
         while (ri < right.size()) {
-            ItemNode rghtNode = right.get(ri);
+            ItemNode rghtNode = rightSorted.get(ri);
             ItemNode currentNode = parent.get(i);
-            sq.getChildren().add(animateColorChangePair(rghtNode, currentNode, Color.ORANGE));
-            sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement()));
-            // currentNode.setElement(rghtNode.getElement());
-            sq.getChildren().add(animateColorChangePair(rghtNode, currentNode, Color.SKYBLUE));
+            sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.ORANGE));
+            
+            sq.getChildren().add(animateValueSet(currentNode, rghtNode.getElement(), 0));
+            sq.getChildren().add(animateColorChangePair( right.get(ri), currentNode, Color.SKYBLUE));
             ri++;
             i++;
         }
@@ -792,8 +819,8 @@ public class Sorting extends DSAbstract<ItemNode> {
         return sq;
     }
 
-    private PauseTransition animateValueSet(ItemNode A, int a) {
-        PauseTransition pr = new PauseTransition(Duration.millis(100));
+    private PauseTransition animateValueSet(ItemNode A, int a, int notTaken) {
+        PauseTransition pr = new PauseTransition(Duration.millis(1));
         pr.setOnFinished(e -> {
             A.setElement(a);
         });
