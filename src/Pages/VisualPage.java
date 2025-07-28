@@ -83,10 +83,8 @@ public class VisualPage {
             animationPane.getChildren().clear(); // Clear the animation pane
             codePane.getTabs().clear();
             controlBox.getChildren().clear(); // Clear the control box
-
             // Action to return to the home page
-
-            stage.getScene().setRoot(HomePage.getView(stage));
+            stage.getScene().setRoot(HomePageUp.getView(stage));
         });
 
         titleRegion = new Region();
@@ -162,6 +160,12 @@ public class VisualPage {
         }
         else if(s.equals("Knapsack")) {
             ds = new Algorithms.DP.Knapsack();
+        }
+        else if(s.equals("LCS")){
+
+        }
+        else if(s.equals("Sequence Alignment")){
+
         }
 
         return root;

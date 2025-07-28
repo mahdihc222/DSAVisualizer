@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
+//Depricated, will be removed in future updates
 public class HomePage {
     private static ScrollPane scrollPane;
     private static VBox mainVBox;

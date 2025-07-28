@@ -1,5 +1,5 @@
 
-import Pages.HomePage;
+import Pages.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -17,7 +17,7 @@ public class Main extends Application {
         primaryStage.setTitle("DSA Visualizer");
         //primaryStage.setFullScreen(true);
         primaryStage.setMaximized(true);
-        Scene scene = new Scene(HomePage.getView(primaryStage));
+        Scene scene = new Scene(HomePageUp.getView(primaryStage));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
