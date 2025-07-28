@@ -111,7 +111,7 @@ public class Knapsack extends DSAbstract<ItemNode> {
             VisualPage.getAnimationPane().getChildren().addAll(anim_j);
             System.out.println(curNode.size());
             timeline = new Timeline(new KeyFrame(Duration.seconds(delay), er -> {
-                if (curAnimationIdx < curNode.size()) {
+                if (curAnimationIdx < curNode.size() - 1) {
                     playCurIdx();
 
                 } else {

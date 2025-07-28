@@ -430,7 +430,7 @@ public class Graph extends DSAbstract<ItemNode> {
         dfsStackLabel.setVisible(true);
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
-            if (curDfsIdx < dfsOrder.size()) {
+            if (curDfsIdx < dfsOrder.size() - 1) {
                 unHighlightCurDfsNode();
                 curDfsIdx++;
                 ItemNode n = dfsOrder.get(curDfsIdx);
@@ -472,7 +472,7 @@ public class Graph extends DSAbstract<ItemNode> {
         bfsQueueLabel.setVisible(true);
 
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
-            if (curBfsIdx < bfsOrder.size()) {
+            if (curBfsIdx < bfsOrder.size() - 1) {
                 curBfsIdx++;
                 ItemNode n = bfsOrder.get(curBfsIdx);
                 if (!isGry.contains(n)) { // white
