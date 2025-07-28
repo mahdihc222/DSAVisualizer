@@ -22,7 +22,7 @@ public class ItemNode extends Group {
     @SuppressWarnings("unused") // redundant warning, needed later
     private boolean isRectangle = true;
     private int elem;
-
+    private Line connectLine = null;
     static final int NODEHEIGHT = 40;
     static final int NODEWIDTH = 40;
     static final int NODERADIUS = 20;
@@ -89,7 +89,7 @@ public class ItemNode extends Group {
         updateTextPosition();
 
         if (this.prev != null) {
-            Line connectLine = getConnectingLine();
+            connectLine = getConnectingLine();
             this.getChildren().add(connectLine);
         }
 
@@ -102,17 +102,9 @@ public class ItemNode extends Group {
         boundary = new Circle(centerX, centerY, NODERADIUS);
         boundary.setFill(Color.WHITE);
         boundary.setStroke(Color.BLACK);
-
-        text = new Text(String.valueOf(elem)); 
+        text = new Text(String.valueOf(elem));
         text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
-
         updateTextPosition();
-
-        if (this.prev != null) {
-            Line connectLine = getConnectingLine();
-            this.getChildren().add(connectLine);
-        }
-
         this.getChildren().addAll(boundary, text);
     }
 
@@ -163,7 +155,6 @@ public class ItemNode extends Group {
             Circle boun = (Circle) boundary;
             boun.setCenterX(x);
             boun.setCenterY(y);
-
         } else {
             ((Rectangle) boundary).setX(x);
             ((Rectangle) boundary).setY(y);
@@ -286,6 +277,16 @@ public class ItemNode extends Group {
     public int getElement() {
         return elem;
     }
+
+    public Line getLine(){
+        return connectLine;
+    }
+
+    public void setLine(Line l){
+        connectLine = l;
+    }
+
+
 
     public void setNodeLayout(double x, double y) {
         this.setLayoutX(x);

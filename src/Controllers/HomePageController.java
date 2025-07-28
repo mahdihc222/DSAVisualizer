@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
+//Depricated, will be removed in future updates
 public class HomePageController {
     private List<Button> DSBtnList = new ArrayList<>();
     private List<String> DSList = List.of("List","Stack","Queue","Binary Search Tree (BST)", "Graph","Heap");

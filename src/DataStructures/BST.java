@@ -1,12 +1,20 @@
 package DataStructures;
 
 import java.util.LinkedHashMap;
+
 import java.util.Random;
 import java.util.function.Consumer;
+
+import javax.naming.PartialResultException;
 import javax.swing.JOptionPane;
 import Helpers.ItemNode;
 import Pages.VisualPage;
+import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.TranslateTransition;
+import javafx.scene.ParallelCamera;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -15,6 +23,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
 public class BST extends DSAbstract<ItemNode> {
@@ -23,7 +32,6 @@ public class BST extends DSAbstract<ItemNode> {
         int element;
         TreeNode left;
         TreeNode right;
-        int x, y;
 
         TreeNode(int elem, TreeNode left, TreeNode right) {
             element = elem;
@@ -35,6 +43,7 @@ public class BST extends DSAbstract<ItemNode> {
     TreeNode root;
     private LinkedHashMap<TreeNode, ItemNode> map = new LinkedHashMap<>();
     private final int HSPACINGBETWEENNODES = 200;
+    private LinkedHashMap<TreeNode, Line> lineMap = new LinkedHashMap<>();
 
     public BST() {
         super();
@@ -45,9 +54,8 @@ public class BST extends DSAbstract<ItemNode> {
         showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        VisualPage.getAnimationPane().getChildren().addAll(lineMap.values());
     }
-
-    
 
     @Override
     protected void initializeControls() {
@@ -62,11 +70,11 @@ public class BST extends DSAbstract<ItemNode> {
         HBox popRow = new HBox(10, removeField, removeButton);
 
         Button generateRandomButton = new Button("Generate Random BST");
-        generateRandomButton.setOnAction(e->generateRandomBST());
+        generateRandomButton.setOnAction(e -> generateRandomBST());
 
         Button clearButton = new Button("Clear");
-        clearButton.setOnAction(e->clear());
-        VBox pushPopBox = new VBox(10, pushRow, popRow,generateRandomButton,clearButton);
+        clearButton.setOnAction(e -> clear());
+        VBox pushPopBox = new VBox(10, pushRow, popRow, generateRandomButton, clearButton);
 
         TextField searchField = new TextField();
         searchField.setPromptText("Enter value");
@@ -115,11 +123,11 @@ public class BST extends DSAbstract<ItemNode> {
     }
 
     @Override
-    protected void showCode(){
+    protected void showCode() {
         Tab bstTab = new Tab("BST");
         bstTab.setContent(getCodeTextArea("BST"));
         VisualPage.getCodePane().getTabs().add(bstTab);
-        VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+        VisualPage.getCodePane().getTabs().forEach(tab -> tab.setClosable(false));
 
     }
 
@@ -128,7 +136,7 @@ public class BST extends DSAbstract<ItemNode> {
         if (!input.isEmpty()) {
             try {
                 int value = Integer.parseInt(input);
-                if(findNodeWithValue(value)==null)
+                if (findNodeWithValue(value) == null)
                     addNode(value);
                 pushField.clear();
             } catch (NumberFormatException ex) {
@@ -151,7 +159,7 @@ public class BST extends DSAbstract<ItemNode> {
     }
 
     @Override
-    protected void clear(){
+    protected void clear() {
         super.clear();
         map.clear();
         root = null;
@@ -267,9 +275,10 @@ public class BST extends DSAbstract<ItemNode> {
         TreeNode newNode = new TreeNode(val, null, null);
         if (root == null) {
             root = newNode;
-            ItemNode rootItem = new ItemNode(val, startingX, startingY, false, null);
+            ItemNode rootItem = new ItemNode(val, startingX, startingY, false);
             map.put(root, rootItem);
             dataNodes.add(rootItem);
+            lineMap.put(root, null);
         } else {
             TreeNode parent = findParentNodeForInsertion(root, val);
             int level = getLevelOfParent(root, val);
@@ -283,11 +292,22 @@ public class BST extends DSAbstract<ItemNode> {
                 parent.right = newNode;
                 x += offset;
             }
-            ItemNode newItem = new ItemNode(val, (int) x, (int) y, false, map.get(parent));
+            ItemNode newItem = new ItemNode(val, (int) x, (int) y, false);
+            double angle = Math.atan2(y - map.get(parent).getY(), x - map.get(parent).getX());
+            double rad = newItem.getNodeRadius();
+            double lineX1, lineX2, lineY1, lineY2;
+            lineX1 = map.get(parent).getX() + rad * Math.cos(angle);
+            lineY1 = map.get(parent).getY() + rad * Math.sin(angle);
+            lineX2 = x - rad * Math.cos(angle);
+            lineY2 = y - rad * Math.sin(angle);
+            Line newLine = new Line(lineX1, lineY1, lineX2, lineY2);
             dataNodes.add(newItem);
             map.put(newNode, newItem);
+            lineMap.put(newNode, newLine);
         }
         VisualPage.getAnimationPane().getChildren().add(map.get(newNode));
+        if (lineMap.get(newNode) != null)
+            VisualPage.getAnimationPane().getChildren().add(lineMap.get(newNode));
         map.get(newNode).flash(Color.CADETBLUE);
 
     }
@@ -467,148 +487,332 @@ public class BST extends DSAbstract<ItemNode> {
         pause.play();
     }
 
-    // Codes for removing a node fromt BST
-
     private void removeNode(int value) {
         TreeNode nodeToDelete = findNodeWithValue(value);
-        if (nodeToDelete == null) {
-            JOptionPane.showMessageDialog(null, "Node with value " + value + " not found", "Warning", 1);
-            return;
-        }
-
-        map.get(nodeToDelete).flash(Color.RED);
-        PauseTransition pr = new PauseTransition(Duration.seconds(1));
+        SequentialTransition master = new SequentialTransition();
+        PauseTransition pr = new PauseTransition(Duration.seconds(0.1));
         pr.setOnFinished(e -> {
-            treeDelete(nodeToDelete);
+            map.get(nodeToDelete).setNodeColor(Color.RED);
         });
-        pr.play();
-    }
+        master.getChildren().add(pr);
+        if (nodeToDelete.left == null && nodeToDelete.right == null) {
+            master.setOnFinished(e -> {
+                VisualPage.getAnimationPane().getChildren().remove(map.get(nodeToDelete));
+                VisualPage.getAnimationPane().getChildren().remove(lineMap.get(nodeToDelete));
+                dataNodes.remove(map.get(nodeToDelete));
+                map.remove(nodeToDelete);
+                lineMap.remove(nodeToDelete);
+                TreeNode parent = findParentNode(nodeToDelete);
+                if (parent.right == nodeToDelete)
+                    parent.right = null;
+                else
+                    parent.left = null;
 
-    private void treeDelete(TreeNode u) {
-        if (u.left == null) {
-            transplant(u, u.right);
-        } else if (u.right == null) {
-            transplant(u, u.left);
-        } else {
-            TreeNode y = treeMinimum(u.right);
-            if (findParentNode(y) != u) {
-                animateTransplantPreview(y, y.right, () -> {
-                    transplant(y, y.right);
-                    y.right = u.right;
-                    animateTransplantPreview(u, y, () -> {
-                        transplant(u, y);
-                        y.left = u.left;
-                        deleteNodeDirectly(u);
-                        repositionTree();
-                    });
-                });
-            } else {
-                animateTransplantPreview(u, y, () -> {
-                    transplant(u, y);
-                    y.left = u.left;
-                    deleteNodeDirectly(u);
-                    repositionTree();
-                });
-            }
-        }
-    }
-
-    private TreeNode treeMinimum(TreeNode node) {
-        while (node.left != null) {
-            node = node.left;
-        }
-        return node;
-    }
-
-    private void transplant(TreeNode u, TreeNode v) {
-        TreeNode parent = findParentNode(u);
-        if (parent == null) {
-            root = v;
-        } else if (u == parent.left) {
-            parent.left = v;
-        } else {
-            parent.right = v;
-        }
-
-        if (u.left == null && u.right == null) {
-            deleteNodeDirectly(u);
-            repositionTree();
-        } else if (u.left == null || u.right == null) {
-            deleteNodeDirectly(u);
-            repositionTree();
-        }
-    }
-
-    private void animateTransplantPreview(TreeNode u, TreeNode v, Runnable callback) {
-        if (v != null) {
-            ItemNode replacementItem = new ItemNode(v.element,(int)(VisualPage.getAnimationPane().getWidth() - 100), 50, false, null);
-            replacementItem.setLayoutX(VisualPage.getAnimationPane().getWidth() - 100);
-            replacementItem.setLayoutY(50);
-            replacementItem.flash(Color.YELLOW);
-
-            VisualPage.getAnimationPane().getChildren().add(replacementItem);
-            dataNodes.add(replacementItem);
-
-            PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
-            pause.setOnFinished(e -> {
-                VisualPage.getAnimationPane().getChildren().remove(replacementItem);
-                dataNodes.remove(replacementItem);
-                callback.run();
             });
-            pause.play();
+        } else if (nodeToDelete.right == null) {
+            master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.left));
+            master.setOnFinished(e -> {
+                dataNodes.remove(map.get(nodeToDelete));
+                map.remove(nodeToDelete);
+                lineMap.remove(nodeToDelete);
+                if (!(nodeToDelete.left.left == null && nodeToDelete.left.right == null)) {
+                    updateTreePositions(nodeToDelete.left, true);
+                    VisualPage.getAnimationPane().getChildren().removeAll();
+                    VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+                    VisualPage.getAnimationPane().getChildren().addAll(lineMap.values());
+                }
+            });
+
+        } else if (nodeToDelete.left == null && nodeToDelete.right.left == null && nodeToDelete.right.right == null) {
+            master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.right));
+            master.setOnFinished(e -> {
+                dataNodes.remove(map.get(nodeToDelete));
+                map.remove(nodeToDelete);
+                lineMap.remove(nodeToDelete);
+            });
         } else {
-            callback.run();
+            TreeNode curr = nodeToDelete.right;
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
+            pause.setOnFinished(e -> {
+                map.get(curr).setNodeColor(Color.ORANGE);
+            });
+            master.getChildren().add(pause);
+
+            PauseTransition pr1 = new PauseTransition(Duration.seconds(0.1));
+            TreeNode minNode = minimumOfSubtree(curr);
+            pr1.setOnFinished(e -> {
+                showMinimum(curr.left, null);
+            });
+
+            master.getChildren().add(exchangeNodePosition(nodeToDelete, minNode));
+            master.setOnFinished(e -> {
+                if (minNode.right == null) {
+                    minNode.left = nodeToDelete.left;
+                    minNode.right = curr;
+                    curr.left = null;
+                    // nodeToDelete.right = nodeToDelete.left = null;
+                    map.get(curr).setNodeColor(Color.WHITE);
+                    map.get(minNode).setNodeColor(Color.WHITE);
+                    dataNodes.remove(map.get(nodeToDelete));
+                    map.remove(nodeToDelete);
+                    lineMap.remove(nodeToDelete);
+                } else {
+
+                }
+
+            });
+
         }
+
+        master.play();
     }
 
-    private void deleteNodeDirectly(TreeNode nodeToDelete) {
-        ItemNode itemToDelete = map.get(nodeToDelete);
-        dataNodes.remove(itemToDelete);
-        VisualPage.getAnimationPane().getChildren().remove(itemToDelete);
-        map.remove(nodeToDelete);
+    private ParallelTransition transplant(TreeNode a, TreeNode b){
+        ParallelTransition prt = new ParallelTransition();
+        return prt;
     }
 
-    private void repositionTree() {
-        if (root != null) {
-            assignPositions(root, VisualPage.getAnimationPane().getWidth() / 2, 50,
-                    VisualPage.getAnimationPane().getWidth() / 4);
-            updateVisualPositions();
-        }
+    private TranslateTransition moveNode(TreeNode node, int dx, int dy){
+        
+        TranslateTransition tr = new TranslateTransition(Duration.seconds(1),map.get(node));
+        tr.setByX(dx);
+        tr.setByY(dy);
+        tr.setOnFinished(e->{
+            map.get(node).setTranslateX(0);
+            map.get(node).setTranslateY(0);
+            map.get(node).setLocation(map.get(node).getX()+dx, map.get(node).getY()+ dy);
+        });
+        return tr;
+
     }
 
-    private void assignPositions(TreeNode node, double x, double y, double offset) {
+    private TranslateTransition exchangeNodePosition(TreeNode a, TreeNode b) {
+        ItemNode aNode = map.get(a);
+        ItemNode bNode = map.get(b);
+        TreeNode parent = findParentNode(a);
+
+        TranslateTransition tr = new TranslateTransition(Duration.seconds(1), bNode);
+        tr.setByX(aNode.getX() - bNode.getX());
+        tr.setByY(aNode.getY() - bNode.getY());
+        tr.setOnFinished(e -> {
+            bNode.setTranslateX(0);
+            bNode.setTranslateY(0);
+            bNode.setLocation(bNode.getX(), bNode.getY());
+            bNode.setLocation(aNode.getX(), aNode.getY());
+
+            VisualPage.getAnimationPane().getChildren().remove(lineMap.get(b));
+            VisualPage.getAnimationPane().getChildren().remove(aNode);
+            lineMap.remove(b);
+            lineMap.put(b, lineMap.get(a));
+            if (parent.left == a) {
+                parent.left = b;
+            } else {
+                parent.right = b;
+            }
+        });
+        return tr;
+
+    }
+
+    private TreeNode minimumOfSubtree(TreeNode node) {
+        if (node.left == null)
+            return node;
+        return minimumOfSubtree(node.left);
+    }
+
+    private void updateTreePositions(TreeNode node, boolean firstCall) {
         if (node == null)
             return;
+        if (firstCall == false) {
+            TreeNode parent = findParentNode(node);
+            int level = findLevelNode(node);
+            double offset = (HSPACINGBETWEENNODES * Math.pow(0.6, level));
+            double x = map.get(parent).getX();
+            double y = map.get(parent).getY() + 80;
+            if (parent.left == node) {
+                x -= offset;
+            } else {
+                x += offset;
+            }
+            double angle = Math.atan2(y - map.get(parent).getY(), x - map.get(parent).getX());
+            double rad = ItemNode.getNodeRadius();
+            double lineX1, lineX2, lineY1, lineY2;
+            lineX1 = map.get(parent).getX() + rad * Math.cos(angle);
+            lineY1 = map.get(parent).getY() + rad * Math.sin(angle);
+            lineX2 = x - rad * Math.cos(angle);
+            lineY2 = y - rad * Math.sin(angle);
+            Line newLine = new Line(lineX1, lineY1, lineX2, lineY2);
+            lineMap.put(node, newLine);
+            map.get(node).setLocation(x, y);
 
-        node.x = (int) x;
-        node.y = (int) y;
-
-        if (node.left != null) {
-            assignPositions(node.left, x - offset, y + 80, offset / 2);
         }
-        if (node.right != null) {
-            assignPositions(node.right, x + offset, y + 80, offset / 2);
-        }
+        updateTreePositions(node.left, false);
+        updateTreePositions(node.right, false);
     }
 
-    private void updateVisualPositions() {
-        for (TreeNode node : map.keySet()) {
-            ItemNode item = map.get(node);
-            item.setLayoutX(node.x);
-            item.setLayoutY(node.y);
+    private int findLevelNode(TreeNode node) {
+
+        TreeNode curr = root;
+        int count = -1;
+        while (curr != null) {
+            if (curr.element < node.element)
+                curr = curr.right;
+            else
+                curr = curr.left;
+            count++;
         }
+        return count;
+
     }
+
+    // Codes for removing a node fromt BST
+    /*
+     * private void removeNode(int value) {
+     * TreeNode nodeToDelete = findNodeWithValue(value);
+     * if (nodeToDelete == null) {
+     * JOptionPane.showMessageDialog(null, "Node with value " + value +
+     * " not found", "Warning", 1);
+     * return;
+     * }
+     * 
+     * map.get(nodeToDelete).flash(Color.RED);
+     * PauseTransition pr = new PauseTransition(Duration.seconds(1));
+     * pr.setOnFinished(e -> {
+     * treeDelete(nodeToDelete);
+     * });
+     * pr.play();
+     * }
+     * 
+     * private void treeDelete(TreeNode u) {
+     * if (u.left == null) {
+     * transplant(u, u.right);
+     * } else if (u.right == null) {
+     * transplant(u, u.left);
+     * } else {
+     * TreeNode y = treeMinimum(u.right);
+     * if (findParentNode(y) != u) {
+     * animateTransplantPreview(y, y.right, () -> {
+     * transplant(y, y.right);
+     * y.right = u.right;
+     * animateTransplantPreview(u, y, () -> {
+     * transplant(u, y);
+     * y.left = u.left;
+     * deleteNodeDirectly(u);
+     * repositionTree();
+     * });
+     * });
+     * } else {
+     * animateTransplantPreview(u, y, () -> {
+     * transplant(u, y);
+     * y.left = u.left;
+     * deleteNodeDirectly(u);
+     * repositionTree();
+     * });
+     * }
+     * }
+     * }
+     * 
+     * private TreeNode treeMinimum(TreeNode node) {
+     * while (node.left != null) {
+     * node = node.left;
+     * }
+     * return node;
+     * }
+     * 
+     * private void transplant(TreeNode u, TreeNode v) {
+     * TreeNode parent = findParentNode(u);
+     * if (parent == null) {
+     * root = v;
+     * } else if (u == parent.left) {
+     * parent.left = v;
+     * } else {
+     * parent.right = v;
+     * }
+     * 
+     * if (u.left == null && u.right == null) {
+     * deleteNodeDirectly(u);
+     * repositionTree();
+     * } else if (u.left == null || u.right == null) {
+     * deleteNodeDirectly(u);
+     * repositionTree();
+     * }
+     * }
+     * 
+     * private void animateTransplantPreview(TreeNode u, TreeNode v, Runnable
+     * callback) {
+     * if (v != null) {
+     * ItemNode replacementItem = new
+     * ItemNode(v.element,(int)(VisualPage.getAnimationPane().getWidth() - 100), 50,
+     * false, null);
+     * replacementItem.setLayoutX(VisualPage.getAnimationPane().getWidth() - 100);
+     * replacementItem.setLayoutY(50);
+     * replacementItem.flash(Color.YELLOW);
+     * 
+     * VisualPage.getAnimationPane().getChildren().add(replacementItem);
+     * dataNodes.add(replacementItem);
+     * 
+     * PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+     * pause.setOnFinished(e -> {
+     * VisualPage.getAnimationPane().getChildren().remove(replacementItem);
+     * dataNodes.remove(replacementItem);
+     * callback.run();
+     * });
+     * pause.play();
+     * } else {
+     * callback.run();
+     * }
+     * }
+     * 
+     * private void deleteNodeDirectly(TreeNode nodeToDelete) {
+     * ItemNode itemToDelete = map.get(nodeToDelete);
+     * dataNodes.remove(itemToDelete);
+     * VisualPage.getAnimationPane().getChildren().remove(itemToDelete);
+     * map.remove(nodeToDelete);
+     * }
+     * 
+     * private void repositionTree() {
+     * if (root != null) {
+     * assignPositions(root, VisualPage.getAnimationPane().getWidth() / 2, 50,
+     * VisualPage.getAnimationPane().getWidth() / 4);
+     * updateVisualPositions();
+     * }
+     * }
+     * 
+     * private void assignPositions(TreeNode node, double x, double y, double
+     * offset) {
+     * if (node == null)
+     * return;
+     * 
+     * node.x = (int) x;
+     * node.y = (int) y;
+     * 
+     * if (node.left != null) {
+     * assignPositions(node.left, x - offset, y + 80, offset / 2);
+     * }
+     * if (node.right != null) {
+     * assignPositions(node.right, x + offset, y + 80, offset / 2);
+     * }
+     * }
+     * 
+     * private void updateVisualPositions() {
+     * for (TreeNode node : map.keySet()) {
+     * ItemNode item = map.get(node);
+     * item.setLayoutX(node.x);
+     * item.setLayoutY(node.y);
+     * }
+     * }
+     */
 
     @Override
     protected void removeLastNode() {
         // This function needs no implementation for BST
     }
 
-    private void generateRandomBST(){
+    private void generateRandomBST() {
         Random r = new Random();
 
-        for(int i=0; i<8;i++){
-            addNode(r.nextInt(98)+1);
+        for (int i = 0; i < 8; i++) {
+            addNode(r.nextInt(98) + 1);
         }
     }
 
