@@ -39,6 +39,22 @@ public class ItemNode extends Group {
         this.getChildren().addAll(boundary, text);
     }
 
+    public ItemNode(String s, int nodeX, int nodeY, int ind) {
+        text = new Text(s); text.setFont(Font.font(FONTNAME, FontWeight.BOLD, TEXTSIZE));
+        boundary = new Rectangle(nodeX, nodeY, NODEWIDTH, NODEHEIGHT);
+        boundary.setFill(Color.WHITE);
+        boundary.setStroke(Color.BLACK);
+        updateTextPosition();
+
+        index = new Text(String.valueOf(ind));
+        index.setX(nodeX + boundary.getLayoutBounds().getWidth() / 2 - index.getLayoutBounds().getWidth());
+        index.setY(getY() + NODEHEIGHT + 15);
+        index.setFill(Color.GRAY);
+        index.setFont(Font.font(FONTNAME, TEXTSIZE));
+
+        this.getChildren().addAll(boundary, text, index);
+    }
+
     // constructor to create rectangular nodes with index
     public ItemNode(int elem, int nodeX, int nodeY, int ind) {
         this.elem = elem;
