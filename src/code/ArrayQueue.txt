@@ -1,0 +1,117 @@
+#include <iostream>
+#include <string>
+using namespace std;
+//This is the array Implementation of Queue
+class ArrayQueue {
+private:
+    int* data;
+    int capacity;
+    int front_idx;
+    int rear_idx;
+
+    void resize(int new_capacity) {
+        if(empty()) return;
+        int* new_data = new(nothrow) int[new_capacity];
+        if(new_data==nullptr) {
+            cerr << "Memory Allocation failed.\n";
+            exit(-1);
+        }
+        int idx = front_idx;
+        int i;
+        for(i=0; true; i++) {
+            new_data[i] = data[idx];
+            if(idx==rear_idx) break;
+            idx = (idx+1)%capacity;
+        }
+        delete[] data;
+        data = new_data;
+        capacity = new_capacity;
+        front_idx = 0;
+        rear_idx = i;
+    }
+
+public:
+    ArrayQueue(int initial_capacity=2) {
+        data = new(nothrow) int[initial_capacity];
+        if(data==nullptr) {
+            cerr << "Memory allocation failed." << endl;
+            exit(-1);
+        }
+        capacity = initial_capacity;
+        front_idx = rear_idx = -1;
+    }
+
+    ~ArrayQueue() {
+        delete[] data;
+    }
+
+    void enqueue(int item) {
+        if((rear_idx+1)%capacity == front_idx) resize(capacity*2);
+        rear_idx = (rear_idx+1)%capacity;
+        data[rear_idx] = item;
+        if(front_idx==-1) front_idx=0;
+    }
+
+    int dequeue() {
+        if(empty()) return -1;
+        int temp = data[front_idx];
+        if(front_idx==rear_idx) {
+            clear();
+        } else {
+            front_idx = (front_idx+1)%capacity;
+            if(size() <= capacity/4 && capacity>2) {
+                resize(capacity/2);
+            }
+        }
+        return temp;
+    }
+
+    void clear() {
+        delete[] data;
+        data = new(nothrow) int[2];
+        if(data==nullptr) {
+            cerr << "Memory allocation failed." << endl;
+            exit(1);
+        }
+        capacity = 2;
+        front_idx = rear_idx = -1;
+    }
+
+    int size() const {
+        if(empty()) return 0;
+        if(rear_idx >= front_idx) return rear_idx-front_idx+1;
+        return capacity-(front_idx-rear_idx)+1;
+    }
+
+    int front() const {
+        if(empty()) return -1;
+        return data[front_idx];
+    }
+
+    int back() const {
+        if(empty()) return -1;
+        return data[rear_idx];
+    }
+
+    bool empty() const {
+        return front_idx == -1;
+    }
+
+    string toString() const {
+        if(empty()) return "<|";
+        string str = "<";
+        int index = front_idx;
+        while(true) {
+            str += to_string(data[index]);
+            if(index==rear_idx) break;
+            index = (index+1)%capacity;
+            str += ", ";
+        }
+        str += "|";
+        return str;
+    }
+
+    int getCapacity() const {
+        return capacity;
+    }
+};

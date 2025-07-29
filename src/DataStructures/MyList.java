@@ -107,9 +107,13 @@ public class MyList extends DSAbstract<ItemNode> {
     @Override
     protected void showCode(){
         Tab arrayListTab = new Tab("Array List");
-        //arrayListTab.setContent(getCodeTextArea("ArrayList"));
+        arrayListTab.setContent(getCodeTextArea("ArrayList"));
 
-        //VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+        Tab linkedListTab = new Tab("Linked List");
+        linkedListTab.setContent(getCodeTextArea("LinkedList"));
+        VisualPage.getCodePane().getTabs().addAll(arrayListTab, linkedListTab);
+        // Disable closing of tabs
+        VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
 
     }
 
