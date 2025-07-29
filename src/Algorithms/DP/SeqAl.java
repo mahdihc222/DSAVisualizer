@@ -21,7 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
-public class LCS extends DSAbstract<ItemNode> {
+public class SeqAl extends DSAbstract<ItemNode> {
     List<ItemNode> headerRow = new ArrayList<>();
     List<ItemNode> rowHeaders = new ArrayList<>();
     List<List<ItemNode>> table = new ArrayList<>();
@@ -36,8 +36,18 @@ public class LCS extends DSAbstract<ItemNode> {
     List<ItemNode> curReconStr2Node = new ArrayList<>(); 
     List<ItemNode> curReconPrev1Node = new ArrayList<>();
     List<ItemNode> curReconPrev2Node = new ArrayList<>();
-    List<ItemNode> lcsNodes = new ArrayList<>();
-    String lcs = new String();
+    List<ItemNode> curReconPrev3Node = new ArrayList<>();
+    List<Integer> setVal = new ArrayList<>();
+    List<Integer> c1List = new ArrayList<>();
+    List<Integer> c2List = new ArrayList<>();
+    List<Integer> c3List = new ArrayList<>();
+    List<ItemNode> seqAlNodes1 = new ArrayList<>();
+    List<ItemNode> seqAlNodes2 = new ArrayList<>();
+    String seqAl1 = new String();
+    String seqAl2 = new String();
+    int[][] dp;
+
+    int matchVal, mismPen, gapPen;
 
     int curAnimationIdx = -1;
     Timeline timeline;
@@ -51,9 +61,9 @@ public class LCS extends DSAbstract<ItemNode> {
     Text dpText = new Text(200, 200, "");
     boolean animIsPaused = false;
     boolean dpTableDone = false;
-    int lcsIdx = -1;
+    int seqAlIdx = -1;
 
-    public LCS() {
+    public SeqAl() {
         initializeControls();
         VisualPage.getControlBox().getChildren().addAll(Controls);
         showCode();
@@ -70,6 +80,13 @@ public class LCS extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().clear();
         VisualPage.getControlBox().getChildren().clear();
         dpText.setFont(Font.font("System", FontWeight.BOLD, 18));
+
+        TextField matchValField = new TextField();
+        matchValField.setPromptText("Enter Match Value");
+        TextField mismPenField = new TextField();
+        mismPenField.setPromptText("Enter mismatch penalty");
+        TextField gapPenField = new TextField();
+        gapPenField.setPromptText("Enter gap penalty");
         TextField stringField1 = new TextField();
         stringField1.setPromptText("Enter first string");
         TextField stringField2 = new TextField();
@@ -87,7 +104,23 @@ public class LCS extends DSAbstract<ItemNode> {
         startButton.setOnAction(e -> {
             input1 = stringField1.getText().trim();
             input2 = stringField2.getText().trim();
-            if (!input1.isEmpty() && !input2.isEmpty()) {
+            String matchValStr = matchValField.getText().trim();
+            String mismPenStr = mismPenField.getText().trim();
+            String gapPenStr = gapPenField.getText().trim();
+            if (!input1.isEmpty() && !input2.isEmpty() && !matchValStr.isEmpty() && !mismPenStr.isEmpty() 
+                    && !gapPenStr.isEmpty()) {
+
+            try {
+                matchVal = Integer.parseInt(matchValStr);
+                mismPen = Integer.parseInt(mismPenStr);
+                gapPen = Integer.parseInt(gapPenStr);
+                matchValField.clear();
+                mismPenField.clear();
+                gapPenField.clear();
+            } catch (NumberFormatException ex) {
+                return;
+            }
+
                 stringField1.clear();
                 stringField2.clear();
                 n = input1.length();
@@ -175,6 +208,9 @@ public class LCS extends DSAbstract<ItemNode> {
                     break;
             }
         });
+        Controls.add(matchValField);
+        Controls.add(mismPenField);
+        Controls.add(gapPenField);
 
         Controls.add(stringField1);
         Controls.add(stringField2);
@@ -203,28 +239,20 @@ public class LCS extends DSAbstract<ItemNode> {
                 prevNodeCase3.get(curAnimationIdx - 1).setNodeColor(Color.WHITE);
         }
 
-        if (prevNodeCase1.get(curAnimationIdx) != null) {
-            curNode.get(curAnimationIdx).setElement(prevNodeCase1.get(curAnimationIdx).getElement() + 1);
-            prevNodeCase1.get(curAnimationIdx).setNodeColor(Color.YELLOW);
-            VisualPage.getAnimationPane().getChildren().remove(dpText);
-            dpText.setText(
-                    "string1[i] = string2[j]\n" + "so, dp[i][j] = dp[i-1][j-1] + 1 = " +
-                            prevNodeCase1.get(curAnimationIdx).getElement() + " + 1 = " +
-                            curNode.get(curAnimationIdx).getElement());
-            VisualPage.getAnimationPane().getChildren().addAll(dpText);
-        } else {
-            prevNodeCase2.get(curAnimationIdx).setNodeColor(Color.YELLOW);
-            prevNodeCase3.get(curAnimationIdx).setNodeColor(Color.YELLOW);
-            int c2 = prevNodeCase2.get(curAnimationIdx).getElement();
-            int c3 = prevNodeCase3.get(curAnimationIdx).getElement();
-            int c = Math.max(c2, c3);
-            curNode.get(curAnimationIdx).setElement(c);
-            VisualPage.getAnimationPane().getChildren().remove(dpText);
-            dpText.setText(
-                    "string1[i] != string2[i]" + "\nso, dp[i][j] = max(dp[i-1][j], dp[i][j-1])"
-                            + " = max(" + c2 + ", " + c3 + ") = " + c);
-            VisualPage.getAnimationPane().getChildren().addAll(dpText);
-        }
+
+
+        VisualPage.getAnimationPane().getChildren().remove(dpText);
+        dpText.setText(
+            "Case 1: " + c1List.get(curAnimationIdx) + "\nCase 2: " + c2List.get(curAnimationIdx) +
+            "\nCase 3: " + c3List.get(curAnimationIdx) + "\ndp[i][j] = " + setVal.get(curAnimationIdx)
+        );
+        VisualPage.getAnimationPane().getChildren().addAll(dpText);
+
+
+        curNode.get(curAnimationIdx).setElement(setVal.get(curAnimationIdx));
+        prevNodeCase1.get(curAnimationIdx).setNodeColor(Color.YELLOW);
+        prevNodeCase2.get(curAnimationIdx).setNodeColor(Color.YELLOW);
+        prevNodeCase3.get(curAnimationIdx).setNodeColor(Color.YELLOW);
 
     }
 
@@ -233,19 +261,23 @@ public class LCS extends DSAbstract<ItemNode> {
     }
 
     void reconstruct() {
-        lcsNodes.clear();
+        seqAlNodes1.clear();
+        seqAlNodes2.clear();
         dpText.setText("");
         int x = 200, y = 200;
-        int s = table.getLast().getLast().getElement();
-        lcsIdx = s-1;
+        int s = seqAl1.length();
+        seqAlIdx = s-1; System.out.println("seqalidx " + seqAlIdx);
         for(int i = 0; i < s; ++i ) {
-            lcsNodes.add(new ItemNode("", x, y));
+            seqAlNodes1.add(new ItemNode("", x, y)); seqAlNodes1.getLast().setVisible(false);
+            seqAlNodes2.add(new ItemNode("", x, y + 50)); seqAlNodes2.getLast().setVisible(false);
             x += 40;
         }       
-        VisualPage.getAnimationPane().getChildren().addAll(lcsNodes);
+        VisualPage.getAnimationPane().getChildren().addAll(seqAlNodes1);
+        VisualPage.getAnimationPane().getChildren().addAll(seqAlNodes2);
         curAnimationIdx = -1;
         string1Nodes.getLast().setNodeColor(Color.WHEAT);
         string2Nodes.getLast().setNodeColor(Color.WHEAT);
+        System.out.println("curreconnodesize " + curReconNode.size());
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), er -> {
             if (curAnimationIdx < curReconNode.size() - 1) {
                 playCurReconIdx();
@@ -260,13 +292,14 @@ public class LCS extends DSAbstract<ItemNode> {
     }
     
     void playCurReconIdx() {
-        
         if(curAnimationIdx >= 0) {
             curReconNode.get(curAnimationIdx).setNodeColor(Color.WHITE);
             if(curReconPrev1Node.get(curAnimationIdx) != null)
              curReconPrev1Node.get(curAnimationIdx).setNodeColor(Color.WHITE);
             if(curReconPrev2Node.get(curAnimationIdx) != null)
              curReconPrev2Node.get(curAnimationIdx).setNodeColor(Color.WHITE);
+             if(curReconPrev3Node.get(curAnimationIdx) != null)
+             curReconPrev3Node.get(curAnimationIdx).setNodeColor(Color.WHITE);
         }
 
         curAnimationIdx++;
@@ -276,13 +309,17 @@ public class LCS extends DSAbstract<ItemNode> {
          curReconPrev1Node.get(curAnimationIdx).setNodeColor(Color.YELLOW);
         if(curReconPrev2Node.get(curAnimationIdx) != null)
          curReconPrev2Node.get(curAnimationIdx).setNodeColor(Color.YELLOW);
+         if(curReconPrev3Node.get(curAnimationIdx) != null)
+         curReconPrev3Node.get(curAnimationIdx).setNodeColor(Color.YELLOW);
 
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(event -> {
-            if(curReconStr1Node.get(curAnimationIdx) != null && curReconStr2Node.get(curAnimationIdx) != null) {
-                lcsNodes.get(lcsIdx).setText( String.valueOf(lcs.charAt(lcsIdx))); lcsIdx--;
 
-            }
+                seqAlNodes1.get(seqAlIdx).setText( String.valueOf(seqAl1.charAt(seqAlIdx))); 
+                seqAlNodes1.get(seqAlIdx).setVisible(true);
+                seqAlNodes2.get(seqAlIdx).setText( String.valueOf(seqAl2.charAt(seqAlIdx)));
+                seqAlNodes2.get(seqAlIdx).setVisible(true);
+                seqAlIdx--;
 
             if(curReconStr1Node.get(curAnimationIdx) != null){
                 for(ItemNode x : string1Nodes) x.setNodeColor(Color.WHITE);
@@ -292,6 +329,8 @@ public class LCS extends DSAbstract<ItemNode> {
                 for(ItemNode x : string2Nodes) x.setNodeColor(Color.WHITE);
                 curReconStr2Node.get(curAnimationIdx).setNodeColor(Color.WHEAT);    
             }
+
+
         });
         pause.play();
     }
@@ -323,62 +362,94 @@ public class LCS extends DSAbstract<ItemNode> {
     }
 
     private void getSteps() {
-        int[][] dp = new int[n + 1][m + 1];
-
+        dp = new int[n + 1][m + 1];
+        
         for (int i = 1; i <= n; ++i) {
             for (int j = 1; j <= m; ++j) {
                 curNode.add(table.get(i).get(j));
 
-                if (input1.charAt(i - 1) == input2.charAt(j - 1)) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                    prevNodeCase1.add(table.get(i - 1).get(j - 1));
-                    prevNodeCase2.add(null);
-                    prevNodeCase3.add(null);
-                } else {
-                    prevNodeCase1.add(null);
-                    prevNodeCase2.add(table.get(i - 1).get(j));
-                    prevNodeCase3.add(table.get(i).get(j - 1));
-                    if (dp[i - 1][j] > dp[i][j - 1]) {
-                        dp[i][j] = dp[i - 1][j];
+                int c1 = dp[i-1][j-1] + ((input1.charAt(i-1) == input2.charAt(j-1)) ? matchVal : mismPen);
+                int c2 = dp[i-1][j] + gapPen;
+                int c3 = dp[i][j-1] + gapPen;
+                int mx = Math.max(c1, c2);
+                mx = Math.max(mx, c3);
+                setVal.add(mx);
+                c1List.add(c1); c2List.add(c2); c3List.add(c3);
 
-                    } else {
-                        dp[i][j] = dp[i][j - 1];
+                prevNodeCase1.add(table.get(i - 1).get(j - 1));
+                prevNodeCase2.add(table.get(i - 1).get(j));
+                prevNodeCase3.add(table.get(i).get(j - 1));
 
-                    }
-
-                }
+                dp[i][j] = mx;
             }
         }
 
-        lcs = new String();
+        seqAl1 = new String();
+        seqAl2 = new String();
         int i = n, j = m; 
-        while(i > 0 && j > 0) { 
-            curReconNode.add(table.get(i).get(j));
-            if(input1.charAt(i-1) == input2.charAt(j-1)) {
-                lcs = input1.charAt(i-1)+ lcs;    
-                System.out.println(lcs);
-                i--; j--; 
-                if(i >= 0) curReconStr1Node.add(string1Nodes.get(i));
-                else curReconStr1Node.add(null);
-                curReconStr2Node.add((j >= 0 ? string2Nodes.get(j) : null));
-                curReconPrev1Node.add(null);
-                curReconPrev2Node.add(null);
-            }
-            else {
-                curReconPrev1Node.add(table.get(i-1).get(j));
-                curReconPrev2Node.add(table.get(i).get(j-1));
-                if(dp[i-1][j] > dp[i][j-1]) {
-                    i--;
-                    curReconStr1Node.add((i >= 0 ? string1Nodes.get(i) : null));
-                    curReconStr2Node.add(null);
-                }
-                else {
-                    j--;
-                    curReconStr2Node.add((j >= 0 ? string2Nodes.get(j) : null));
-                    curReconStr1Node.add(null);
-                }
-            }
+
+while(i > 0 || j > 0) {
+
+        curReconNode.add(table.get(i).get(j));
+        if(i > 0 && j > 0) curReconPrev1Node.add(table.get(i - 1).get(j - 1));
+        else curReconPrev1Node.add(null);
+        if(i > 0) curReconPrev2Node.add(table.get(i - 1).get(j));
+        else curReconPrev2Node.add(null);
+        if(i > 0 && j > 0) curReconPrev3Node.add(table.get(i).get(j - 1));
+        else curReconPrev3Node.add(null);
+
+    if(i > 0 && j > 0) {
+        
+
+        int c1 = dp[i-1][j-1] + ((input1.charAt(i-1) == input2.charAt(j-1)) ? matchVal : mismPen);
+        int c2 = dp[i-1][j] + gapPen;
+        int c3 = dp[i][j-1] + gapPen;
+
+        if(dp[i][j] == c1) {
+            seqAl1 = input1.charAt(i-1) + seqAl1;
+            seqAl2 = input2.charAt(j-1) + seqAl2;
+            i--; j--;
+            curReconStr1Node.add(i >= 0 ? string1Nodes.get(i) : null);
+            curReconStr2Node.add(j >= 0 ? string2Nodes.get(j) : null);
         }
+        else if(dp[i][j] == c2) {
+            seqAl1 = input1.charAt(i-1) + seqAl1;
+            seqAl2 = "-" + seqAl2;
+            i--;
+            curReconStr1Node.add(i >= 0 ? string1Nodes.get(i) : null);
+            curReconStr2Node.add(null);
+        }
+        else {
+            seqAl1 = "-" + seqAl1;
+            seqAl2 = input2.charAt(j-1) + seqAl2;
+            j--;
+            curReconStr1Node.add(null);
+            curReconStr2Node.add(j >= 0 ? string2Nodes.get(j) : null);
+        }
+    }
+
+
+    else if(i > 0) {
+        seqAl1 = input1.charAt(i-1) + seqAl1;
+        seqAl2 = "-" + seqAl2;
+        i--;
+        curReconStr1Node.add(i >= 0 ? string1Nodes.get(i) : null);
+        curReconStr2Node.add(null);
+    }
+
+
+    else if(j > 0) {
+        seqAl1 = "-" + seqAl1;
+        seqAl2 = input2.charAt(j-1) + seqAl2;
+        j--;
+        curReconStr1Node.add(null);
+        curReconStr2Node.add(j >= 0 ? string2Nodes.get(j) : null);
+    }
+
+    System.out.println(seqAl1);
+    System.out.println(seqAl2);
+}
+
     }
 
     @Override
@@ -388,9 +459,9 @@ public class LCS extends DSAbstract<ItemNode> {
 
     @Override
     protected void showCode() {
-        Tab lcstab = new Tab("LCS");
-        lcstab.setContent(getCodeTextArea("LCS"));
-        VisualPage.getCodePane().getTabs().add(lcstab);
+        Tab seqAltab = new Tab("SeqAl");
+        seqAltab.setContent(getCodeTextArea("SeqAl"));
+        VisualPage.getCodePane().getTabs().add(seqAltab);
         VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
     }
 

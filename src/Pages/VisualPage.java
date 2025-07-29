@@ -165,7 +165,7 @@ public class VisualPage {
             ds = new Algorithms.DP.LCS();
         }
         else if(s.equals("Sequence Alignment")){
-
+            ds = new Algorithms.DP.SeqAl();
         }
 
         return root;
