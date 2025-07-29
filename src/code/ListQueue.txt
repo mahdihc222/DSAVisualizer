@@ -1,0 +1,87 @@
+#include <iostream>
+#include <string>
+using namespace std;
+//Linked List Implementation of Queue
+class ListQueue {
+private:
+    struct Node {
+        int data;
+        Node* next;
+        Node(int val) : data(val), next(nullptr) {}
+    };
+
+    Node* front_node;
+    Node* rear_node;
+    int current_size;
+
+public:
+    ListQueue() : front_node(nullptr), rear_node(nullptr), current_size(0) {}
+
+    ~ListQueue() {
+        clear();
+    }
+
+    void enqueue(int item) {
+        Node* temp = new Node(item);
+        if (rear_node == nullptr) {
+            front_node = rear_node = temp;
+        } else {
+            rear_node->next = temp;
+            rear_node = temp;
+        }
+        current_size++;
+    }
+
+    int dequeue() {
+        if (empty()) return -1;
+        
+        int tmp_data = front_node->data;
+        Node* temp = front_node;
+        front_node = front_node->next;
+        if (front_node == nullptr) rear_node = nullptr;
+        
+        delete temp;
+        current_size--;
+        return tmp_data;
+    }
+
+    void clear() {
+        while (front_node) {
+            Node* temp = front_node;
+            front_node = front_node->next;
+            delete temp;
+        }
+        front_node = rear_node = nullptr;
+        current_size = 0;
+    }
+
+    int size() const {
+        return current_size;
+    }
+
+    int front() const {
+        if (empty()) return -1;
+        return front_node->data;
+    }
+
+    int back() const {
+        if (empty()) return -1;
+        return rear_node->data;
+    }
+
+    bool empty() const {
+        return front_node == nullptr;
+    }
+
+    string toString() const {
+        string str = "<";
+        Node* temp = front_node;
+        while (temp) {
+            str += to_string(temp->data);
+            if (temp->next) str += ", ";
+            temp = temp->next;
+        }
+        str += "|";
+        return str;
+    }
+};

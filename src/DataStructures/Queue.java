@@ -4,6 +4,7 @@ import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,7 @@ public class Queue extends DSAbstract<ItemNode> {
 
     public Queue() {
         initializeControls();
+        showCode();
         VisualPage.getControlBox().getChildren().addAll(Controls);
     }
 
@@ -88,7 +90,15 @@ public class Queue extends DSAbstract<ItemNode> {
 
     @Override
     protected void showCode() {
-        // TODO Auto-generated method stub
+        Tab queueTab = new Tab("Array Queue");
+        queueTab.setContent(getCodeTextArea("ArrayQueue"));
+
+        Tab linkedQueueTab = new Tab("Linked List Queue");
+        linkedQueueTab.setContent(getCodeTextArea("ListQueue"));
+
+        VisualPage.getCodePane().getTabs().addAll(queueTab, linkedQueueTab);
+        // Disable closing of tabs
+        VisualPage.getCodePane().getTabs().forEach(tab -> tab.setClosable(false));
 
     }
 

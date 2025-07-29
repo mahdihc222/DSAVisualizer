@@ -34,12 +34,12 @@ public class HomePageUp {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        mainVBox = new VBox();
+        mainVBox = new VBox(100);
         mainVBox.setPrefWidth(900);
         mainVBox.setSpacing(25);
 
         centerBox = new HBox(mainVBox);
-        HBox.setMargin(mainVBox, new Insets(25, 25, 25, 25));
+        HBox.setMargin(mainVBox, new Insets(60, 25, 25, 25));
         centerBox.setAlignment(Pos.CENTER);
 
         Heading = new Label("Select An Option");
@@ -48,7 +48,7 @@ public class HomePageUp {
 
         menu = new GridPane();
         menu.setHgap(10);
-        menu.setVgap(10);
+        menu.setVgap(50);
         menu.setAlignment(Pos.CENTER);
         menu.setPadding(new Insets(10, 10, 10, 10));
 
@@ -61,6 +61,11 @@ public class HomePageUp {
         menu.add(getGridPaneItem("Queue", "Queue", stage), 1, 1);
         menu.add(getGridPaneItem("DP", "Dynamic Programming", stage), 2, 1);
         menu.add(getGridPaneItem("List", "List", stage), 3, 1);
+        
+        Label emptyLabel = new Label(" ");
+        emptyLabel.setFont(Font.font("Arial", FontWeight.BOLD, 8));
+        mainVBox.getChildren().add(emptyLabel); //for spacing
+
         mainVBox.getChildren().add(menu);
         scrollPane.setContent(centerBox);
 
@@ -68,20 +73,19 @@ public class HomePageUp {
 
     private static VBox getGridPaneItem(String imageName, String topicName, Stage stage) {
         VBox vbox = new VBox();
-
         vbox.setStyle(
                 "-fx-background-color: #f0f0f0; " + // Normal background
                         "-fx-border-color:rgb(139, 139, 139); " +
                         "-fx-border-width: 1; " +
-                        "-fx-border-radius: 3; " +
+                        "-fx-border-radius: 8; " +
                         "fx-border-insets: 20; " +
                         "-fx-padding: 10;");
 
         // Hover effect
         vbox.setOnMouseEntered(e -> vbox.setStyle(
-                "-fx-background-color:rgb(179, 179, 186); " + // Lighter blue on hover
+                "-fx-background-color:rgb(216, 216, 216); " + 
                         "-fx-border-color:rgb(185, 185, 190); " +
-                        "-fx-border-width: 2; " +
+                        "-fx-border-width: 1; " +
                         "-fx-border-radius: 3; " +
                         "-fx-padding: 10; " +
                         "fx-border-insets: 20; " +
@@ -92,7 +96,7 @@ public class HomePageUp {
                 "-fx-background-color: #f0f0f0; " + // Revert to normal
                         "-fx-border-color:rgb(139,139,139); " +
                         "-fx-border-width: 1; " +
-                        "-fx-border-radius: 3; " +
+                        "-fx-border-radius: 8; " +
                         "fx-border-insets: 20; " +
                         "-fx-padding: 10;"));
         Image img = new Image(HomePageUp.class.getResourceAsStream("/Images/" + imageName + ".png"));
