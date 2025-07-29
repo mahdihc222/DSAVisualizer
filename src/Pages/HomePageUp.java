@@ -54,8 +54,8 @@ public class HomePageUp {
 
         menu.add(getGridPaneItem("Graph", "Graph", stage), 0, 0);
         menu.add(getGridPaneItem("Heap", "Heap", stage), 1, 0);
-        menu.add(getGridPaneItem("Sorting", "Sorting", stage), 2, 0);
-        menu.add(getGridPaneItem("BST", "Binary Search Tree (BST)", stage), 3, 0);
+        menu.add(getGridPaneItem("BST", "Binary Search Tree (BST)", stage), 2, 0);
+        menu.add(getGridPaneItem("Sorting", "Sorting", stage), 3, 0);
 
         menu.add(getGridPaneItem("Stack", "Stack", stage), 0, 1);
         menu.add(getGridPaneItem("Queue", "Queue", stage), 1, 1);
@@ -72,7 +72,7 @@ public class HomePageUp {
     }
 
     private static VBox getGridPaneItem(String imageName, String topicName, Stage stage) {
-        VBox vbox = new VBox();
+        VBox vbox = new VBox(20); 
         vbox.setStyle(
                 "-fx-background-color: #f0f0f0; " + // Normal background
                         "-fx-border-color:rgb(139, 139, 139); " +
@@ -83,10 +83,10 @@ public class HomePageUp {
 
         // Hover effect
         vbox.setOnMouseEntered(e -> vbox.setStyle(
-                "-fx-background-color:rgb(216, 216, 216); " + 
-                        "-fx-border-color:rgb(185, 185, 190); " +
+                "-fx-background-color:rgb(231, 241, 241); " + 
+                        "-fx-border-color:rgb(139, 139, 139); " +
                         "-fx-border-width: 1; " +
-                        "-fx-border-radius: 3; " +
+                        "-fx-border-radius: 6; " +
                         "-fx-padding: 10; " +
                         "fx-border-insets: 20; " +
                         "-fx-cursor: hand;" // Changes cursor to hand icon
