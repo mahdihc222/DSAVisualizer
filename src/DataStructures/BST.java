@@ -294,7 +294,7 @@ public class BST extends DSAbstract<ItemNode> {
             }
             ItemNode newItem = new ItemNode(val, (int) x, (int) y, false);
             double angle = Math.atan2(y - map.get(parent).getY(), x - map.get(parent).getX());
-            double rad = newItem.getNodeRadius();
+            double rad = ItemNode.getNodeRadius();
             double lineX1, lineX2, lineY1, lineY2;
             lineX1 = map.get(parent).getX() + rad * Math.cos(angle);
             lineY1 = map.get(parent).getY() + rad * Math.sin(angle);
@@ -450,7 +450,7 @@ public class BST extends DSAbstract<ItemNode> {
 
     private void showHeight(TreeNode node, Label heightLabel, Consumer<Integer> callback) {
         if (node == null) {
-            callback.accept(0); // base case: null has height 0
+            callback.accept(0);
             return;
         }
 
@@ -459,7 +459,6 @@ public class BST extends DSAbstract<ItemNode> {
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(e -> {
 
-            // recurse left
             showHeight(node.left, heightLabel, leftHeight -> {
 
                 PauseTransition pauseRight = new PauseTransition(Duration.seconds(1));
@@ -495,6 +494,8 @@ public class BST extends DSAbstract<ItemNode> {
             map.get(nodeToDelete).setNodeColor(Color.RED);
         });
         master.getChildren().add(pr);
+        PauseTransition showColor = new PauseTransition(Duration.seconds(0.2));
+        master.getChildren().add(showColor);
         if (nodeToDelete.left == null && nodeToDelete.right == null) {
             master.setOnFinished(e -> {
                 VisualPage.getAnimationPane().getChildren().remove(map.get(nodeToDelete));
@@ -510,25 +511,41 @@ public class BST extends DSAbstract<ItemNode> {
 
             });
         } else if (nodeToDelete.right == null) {
-            master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.left));
+            if (nodeToDelete.left.left == null && nodeToDelete.left.right == null) {
+                master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.left));
+
+            }
+
+            else
+                master.getChildren().add(transplant(nodeToDelete, nodeToDelete.left));
+
             master.setOnFinished(e -> {
                 dataNodes.remove(map.get(nodeToDelete));
                 map.remove(nodeToDelete);
                 lineMap.remove(nodeToDelete);
                 if (!(nodeToDelete.left.left == null && nodeToDelete.left.right == null)) {
-                    updateTreePositions(nodeToDelete.left, true);
-                    VisualPage.getAnimationPane().getChildren().removeAll();
-                    VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
-                    VisualPage.getAnimationPane().getChildren().addAll(lineMap.values());
+                    refresh(true);
+                } else {
+                    refresh(false);
                 }
             });
 
-        } else if (nodeToDelete.left == null && nodeToDelete.right.left == null && nodeToDelete.right.right == null) {
-            master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.right));
+        } else if (nodeToDelete.left == null) {
+            if (nodeToDelete.right.left == null && nodeToDelete.right.right == null) {
+                master.getChildren().add(exchangeNodePosition(nodeToDelete, nodeToDelete.right));
+
+            } else
+                master.getChildren().add(transplant(nodeToDelete, nodeToDelete.right));
             master.setOnFinished(e -> {
                 dataNodes.remove(map.get(nodeToDelete));
                 map.remove(nodeToDelete);
                 lineMap.remove(nodeToDelete);
+                if (!(nodeToDelete.right.left == null && nodeToDelete.right.right == null)) {
+                    refresh(true);
+                } else {
+                    refresh(false);
+                }
+
             });
         } else {
             TreeNode curr = nodeToDelete.right;
@@ -543,44 +560,133 @@ public class BST extends DSAbstract<ItemNode> {
             pr1.setOnFinished(e -> {
                 showMinimum(curr.left, null);
             });
+            master.getChildren().add(pr1);
 
-            master.getChildren().add(exchangeNodePosition(nodeToDelete, minNode));
-            master.setOnFinished(e -> {
-                if (minNode.right == null) {
-                    minNode.left = nodeToDelete.left;
-                    minNode.right = curr;
-                    curr.left = null;
-                    // nodeToDelete.right = nodeToDelete.left = null;
-                    map.get(curr).setNodeColor(Color.WHITE);
-                    map.get(minNode).setNodeColor(Color.WHITE);
-                    dataNodes.remove(map.get(nodeToDelete));
-                    map.remove(nodeToDelete);
-                    lineMap.remove(nodeToDelete);
-                } else {
+            if (findParentNode(minNode) != nodeToDelete) {
+                if (minNode.right != null)
+                    master.getChildren().add(transplant(minNode, minNode.right));
+                PauseTransition breaker = new PauseTransition(Duration.seconds(0.1));
+                breaker.setOnFinished(e -> {
+                    if (minNode.right == null) {
+                        findParentNode(minNode).left = null;
+                    }
+                    minNode.right = nodeToDelete.right;
 
-                }
+                });
+                master.getChildren().add(breaker);
 
+                master.getChildren().add(moveNode(minNode,
+                        map.get(nodeToDelete).getX() - map.get(minNode).getX(),
+                        map.get(nodeToDelete).getY() - map.get(minNode).getY()));
+                PauseTransition updaterParent = new PauseTransition(Duration.millis(100));
+                updaterParent.setOnFinished(e -> {
+                    TreeNode parent = findParentNode(nodeToDelete);
+                    if (parent == null) {
+                        root = minNode;
+                    } else if (parent.left == nodeToDelete) {
+                        parent.left = minNode;
+                    } else {
+                        parent.right = minNode;
+                    }
+                });
+                master.getChildren().add(updaterParent);
+            } else {
+                master.getChildren().add(transplant(nodeToDelete, minNode));
+            }
+
+            PauseTransition pr3 = new PauseTransition(Duration.seconds(0.1));
+            pr3.setOnFinished(e -> {
+                minNode.left = nodeToDelete.left;
             });
+            master.getChildren().add(pr3);
+            master.setOnFinished(e -> {
+                dataNodes.remove(map.get(nodeToDelete));
+                map.remove(nodeToDelete);
 
+                if (lineMap.get(nodeToDelete) != null) {
+                    lineMap.put(minNode, lineMap.get(nodeToDelete));
+                    lineMap.remove(nodeToDelete);
+                }
+                refresh(true);
+            });
         }
 
         master.play();
     }
 
-    private ParallelTransition transplant(TreeNode a, TreeNode b){
+    private void refresh(boolean isFixNeeded) {
+        VisualPage.getAnimationPane().getChildren().clear();
+        lineMap.clear();
+        fixBST(root, 1);
+        VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
+        VisualPage.getAnimationPane().getChildren().addAll(lineMap.values());
+        for (ItemNode itemNode : dataNodes) {
+            itemNode.setNodeColor(Color.WHITE);
+        }
+    }
+
+    private ParallelTransition transplant(TreeNode a, TreeNode b) {
         ParallelTransition prt = new ParallelTransition();
+        double dx = map.get(a).getX() - map.get(b).getX();
+        double dy = map.get(a).getY() - map.get(b).getY();
+        TreeNode parent = findParentNode(a);
+
+        java.util.Stack<TreeNode> stack = new java.util.Stack<>();
+        stack.push(b);
+        while (!stack.empty()) {
+            TreeNode node = stack.pop();
+            prt.getChildren().add(moveNode(node, dx, dy));
+            if (node != b && lineMap.get(node) != null) {
+                prt.getChildren().add(moveLine(lineMap.get(node), dx, dy));
+            }
+            if (node.right != null)
+                stack.push(node.right);
+            if (node.left != null)
+                stack.push(node.left);
+
+        }
+        prt.setOnFinished(e -> {
+            // if (a.left != b && a.right != b)
+            VisualPage.getAnimationPane().getChildren().remove(lineMap.get(b));
+
+            lineMap.remove(b);
+            lineMap.put(b, lineMap.get(a));
+            if (parent == null) {
+                root = b;
+            } else if (parent.left == a) {
+                parent.left = b;
+            } else {
+                parent.right = b;
+            }
+
+        });
         return prt;
     }
 
-    private TranslateTransition moveNode(TreeNode node, int dx, int dy){
-        
-        TranslateTransition tr = new TranslateTransition(Duration.seconds(1),map.get(node));
+    private TranslateTransition moveLine(Line l, double dx, double dy) {
+        TranslateTransition tr = new TranslateTransition(Duration.seconds(1), l);
         tr.setByX(dx);
         tr.setByY(dy);
-        tr.setOnFinished(e->{
+        tr.setOnFinished(e -> {
+            l.setTranslateX(0);
+            l.setTranslateY(0);
+            l.setStartX(l.getStartX() + dx);
+            l.setEndX(l.getEndX() + dx);
+            l.setStartY(l.getStartY() + dy);
+            l.setEndY(l.getEndY() + dy);
+        });
+        return tr;
+    }
+
+    private TranslateTransition moveNode(TreeNode node, double dx, double dy) {
+
+        TranslateTransition tr = new TranslateTransition(Duration.seconds(1), map.get(node));
+        tr.setByX(dx);
+        tr.setByY(dy);
+        tr.setOnFinished(e -> {
             map.get(node).setTranslateX(0);
             map.get(node).setTranslateY(0);
-            map.get(node).setLocation(map.get(node).getX()+dx, map.get(node).getY()+ dy);
+            map.get(node).setLocation(map.get(node).getX() + dx, map.get(node).getY() + dy);
         });
         return tr;
 
@@ -604,7 +710,9 @@ public class BST extends DSAbstract<ItemNode> {
             VisualPage.getAnimationPane().getChildren().remove(aNode);
             lineMap.remove(b);
             lineMap.put(b, lineMap.get(a));
-            if (parent.left == a) {
+            if (parent == null) {
+                root = b;
+            } else if (parent.left == a) {
                 parent.left = b;
             } else {
                 parent.right = b;
@@ -620,34 +728,53 @@ public class BST extends DSAbstract<ItemNode> {
         return minimumOfSubtree(node.left);
     }
 
-    private void updateTreePositions(TreeNode node, boolean firstCall) {
+    private void fixBST(TreeNode node, int lvl) {
         if (node == null)
             return;
-        if (firstCall == false) {
-            TreeNode parent = findParentNode(node);
-            int level = findLevelNode(node);
-            double offset = (HSPACINGBETWEENNODES * Math.pow(0.6, level));
-            double x = map.get(parent).getX();
-            double y = map.get(parent).getY() + 80;
-            if (parent.left == node) {
-                x -= offset;
-            } else {
-                x += offset;
-            }
-            double angle = Math.atan2(y - map.get(parent).getY(), x - map.get(parent).getX());
+
+        ItemNode parentNode = map.get(node);
+        double parX = parentNode.getX();
+        double parY = parentNode.getY();
+        double currY = parY + 80;
+        double currX = parX;
+        double offset = HSPACINGBETWEENNODES * Math.pow(0.6, lvl);
+        if (node.left != null) {
+            ItemNode leftNode = map.get(node.left);
+            currX -= offset;
+            leftNode.setLocation((int) currX, (int) currY);
+            double angle = Math.atan2(currY - parY, currX - parX);
             double rad = ItemNode.getNodeRadius();
             double lineX1, lineX2, lineY1, lineY2;
-            lineX1 = map.get(parent).getX() + rad * Math.cos(angle);
-            lineY1 = map.get(parent).getY() + rad * Math.sin(angle);
-            lineX2 = x - rad * Math.cos(angle);
-            lineY2 = y - rad * Math.sin(angle);
+            lineX1 = parX + rad * Math.cos(angle);
+            lineY1 = parY + rad * Math.sin(angle);
+            lineX2 = currX - rad * Math.cos(angle);
+            lineY2 = currY - rad * Math.sin(angle);
             Line newLine = new Line(lineX1, lineY1, lineX2, lineY2);
-            lineMap.put(node, newLine);
-            map.get(node).setLocation(x, y);
-
+            lineMap.put(node.left, newLine);
         }
-        updateTreePositions(node.left, false);
-        updateTreePositions(node.right, false);
+
+        currX = parX;
+        if (node.right != null) {
+            ItemNode rightNode = map.get(node.right);
+            currX += offset;
+            rightNode.setLocation((int) currX, (int) currY);
+            double angle = Math.atan2(currY - parY, currX - parX);
+            double rad = ItemNode.getNodeRadius();
+            double lineX1, lineX2, lineY1, lineY2;
+            lineX1 = parX + rad * Math.cos(angle);
+            lineY1 = parY + rad * Math.sin(angle);
+            lineX2 = currX - rad * Math.cos(angle);
+            lineY2 = currY - rad * Math.sin(angle);
+            Line newLine = new Line(lineX1, lineY1, lineX2, lineY2);
+            lineMap.put(node.right, newLine);
+        }
+
+        if (node.left != null) {
+            fixBST(node.left, lvl + 1);
+        }
+        if (node.right != null) {
+            fixBST(node.right, lvl + 1);
+        }
     }
 
     private int findLevelNode(TreeNode node) {
@@ -662,7 +789,6 @@ public class BST extends DSAbstract<ItemNode> {
             count++;
         }
         return count;
-
     }
 
     // Codes for removing a node fromt BST
