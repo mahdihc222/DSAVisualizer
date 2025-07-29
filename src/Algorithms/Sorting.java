@@ -687,10 +687,10 @@ public class Sorting extends DSAbstract<ItemNode> {
     private void animateMergeSort() {
         if (dataNodes.isEmpty())
             return;
-        mergeSort(0, dataNodes.size() - 1, dataNodes, 0).play();
+        mergeSort(0, dataNodes.size() - 1, dataNodes, 0, '0').play();
     }
 
-    private SequentialTransition mergeSort(int low, int high, List<ItemNode> prevList, int lvl) {
+    private SequentialTransition mergeSort(int low, int high, List<ItemNode> prevList, int lvl, char side) {
         if (low == high)
             return new SequentialTransition(new PauseTransition(Duration.seconds(0.001)));
         SequentialTransition sq = new SequentialTransition();
@@ -698,7 +698,7 @@ public class Sorting extends DSAbstract<ItemNode> {
         ArrayList<ItemNode> leftNodes = new ArrayList<>();
         for (int i = 0; i <= mid; i++) {
             if(lvl == 0) leftNodes.add(duplicateItemNode(prevList.get(i))); 
-            else leftNodes.add(duplicateItemNode(prevList.get(i), 'l')); 
+            else leftNodes.add(duplicateItemNode(prevList.get(i), side)); 
         }
         PauseTransition prl = new PauseTransition(Duration.millis(50));
         prl.setOnFinished(e -> {
@@ -710,7 +710,6 @@ public class Sorting extends DSAbstract<ItemNode> {
         for (ItemNode it : leftNodes) {
             TranslateTransition tr = new TranslateTransition(Duration.seconds(1), it);
             System.out.println("current elem : " + it.getElement() + " x: " + it.getX() + " y: " + it.getY()); 
-            
             tr.setByY(70 );
             tr.setByX(-10 );
             System.out.println("after setby. checking if update happens here");
@@ -719,12 +718,12 @@ public class Sorting extends DSAbstract<ItemNode> {
         }
         sq.getChildren().add(moveLefts);
 
-        sq.getChildren().add(mergeSort(0, leftNodes.size()-1, leftNodes, lvl + 1));
+        sq.getChildren().add(mergeSort(0, leftNodes.size()-1, leftNodes, lvl + 1, 'l'));
 
         ArrayList<ItemNode> rightNodes = new ArrayList<>();
         for (int i = mid + 1; i <= high; i++) {
             if(lvl == 0) rightNodes.add(duplicateItemNode(prevList.get(i)));
-            else rightNodes.add(duplicateItemNode(prevList.get(i), 'r'));
+            else rightNodes.add(duplicateItemNode(prevList.get(i), side));
         }
         PauseTransition prr = new PauseTransition(Duration.millis(50));
         prr.setOnFinished(e -> {
@@ -742,7 +741,7 @@ public class Sorting extends DSAbstract<ItemNode> {
         }
 
         sq.getChildren().add(moveRights);
-        sq.getChildren().add(mergeSort(0, rightNodes.size()-1, rightNodes, lvl + 1));
+        sq.getChildren().add(mergeSort(0, rightNodes.size()-1, rightNodes, lvl + 1, 'r'));
 
         
 

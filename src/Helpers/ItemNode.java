@@ -274,6 +274,11 @@ public class ItemNode extends Group {
         updateTextPosition();
     }
 
+    public void setText(String s) {
+        text.setText(s);
+        updateTextPosition();
+    }
+
     public int getElement() {
         return elem;
     }

@@ -8,6 +8,7 @@ import Helpers.ItemNode;
 import Pages.VisualPage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -29,6 +30,13 @@ public class LCS extends DSAbstract<ItemNode> {
     List<ItemNode> prevNodeCase3 = new ArrayList<>();
 
     List<ItemNode> reconStr = new ArrayList<>();
+    List<ItemNode> curReconNode = new ArrayList<>();
+    List<ItemNode> curReconStr1Node = new ArrayList<>();
+    List<ItemNode> curReconStr2Node = new ArrayList<>(); 
+    List<ItemNode> curReconPrev1Node = new ArrayList<>();
+    List<ItemNode> curReconPrev2Node = new ArrayList<>();
+    List<ItemNode> lcsNodes = new ArrayList<>();
+    String lcs = new String();
 
     int curAnimationIdx = -1;
     Timeline timeline;
@@ -41,6 +49,8 @@ public class LCS extends DSAbstract<ItemNode> {
 
     Text dpText = new Text(200, 200, "");
     boolean animIsPaused = false;
+    boolean dpTableDone = false;
+    int lcsIdx = -1;
 
     public LCS() {
         initializeControls();
@@ -105,6 +115,7 @@ public class LCS extends DSAbstract<ItemNode> {
 
                     } else {
 
+                        dpTableDone = true;
                         timeline.stop(); // end of animation
                         string1Nodes.getLast().setNodeColor(Color.WHITE);
                         string2Nodes.getLast().setNodeColor(Color.WHITE);
@@ -138,12 +149,12 @@ public class LCS extends DSAbstract<ItemNode> {
         });
 
         prevButton.setOnAction(e -> {
-            if (animIsPaused)
+            if (animIsPaused && !dpTableDone)
                 revCurIdx();
         });
 
         nextButton.setOnAction(e -> {
-            if (animIsPaused)
+            if (animIsPaused && !dpTableDone)
                 playCurIdx();
         });
 
@@ -221,23 +232,67 @@ public class LCS extends DSAbstract<ItemNode> {
     }
 
     void reconstruct() {
-        curNode.clear();
-        getReconstructNodes();
+        lcsNodes.clear();
+        dpText.setText("");
+        int x = 200, y = 200;
+        int s = table.getLast().getLast().getElement();
+        lcsIdx = s-1;
+        for(int i = 0; i < s; ++i ) {
+            lcsNodes.add(new ItemNode("", x, y));
+            x += 40;
+        }       
+        VisualPage.getAnimationPane().getChildren().addAll(lcsNodes);
+        curAnimationIdx = -1;
+        string1Nodes.getLast().setNodeColor(Color.WHEAT);
+        string2Nodes.getLast().setNodeColor(Color.WHEAT);
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), er -> {
-            if (curAnimationIdx < curNode.size() - 1) {
-                playCurIdx();
-
+            if (curAnimationIdx < curReconNode.size() - 1) {
+                playCurReconIdx();
             } else {
-                
+                for(ItemNode it : string1Nodes) it.setNodeColor(Color.WHITE); 
+                for(ItemNode it : string2Nodes) it.setNodeColor(Color.WHITE); 
+                for(List<ItemNode> li : table) for(ItemNode it : li) it.setNodeColor(Color.WHITE);
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.playFromStart();
-
     }
-    
-    void getReconstructNodes() {
 
+    void playCurReconIdx() {
+        
+        if(curAnimationIdx >= 0) {
+            curReconNode.get(curAnimationIdx).setNodeColor(Color.WHITE);
+            if(curReconPrev1Node.get(curAnimationIdx) != null)
+             curReconPrev1Node.get(curAnimationIdx).setNodeColor(Color.WHITE);
+            if(curReconPrev2Node.get(curAnimationIdx) != null)
+             curReconPrev2Node.get(curAnimationIdx).setNodeColor(Color.WHITE);
+        }
+
+        curAnimationIdx++;
+
+        curReconNode.get(curAnimationIdx).setNodeColor(Color.ORANGE);
+        if(curReconPrev1Node.get(curAnimationIdx) != null) 
+         curReconPrev1Node.get(curAnimationIdx).setNodeColor(Color.YELLOW);
+        if(curReconPrev2Node.get(curAnimationIdx) != null)
+         curReconPrev2Node.get(curAnimationIdx).setNodeColor(Color.YELLOW);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+            if(curReconStr1Node.get(curAnimationIdx) != null && curReconStr2Node.get(curAnimationIdx) != null) {
+                lcsNodes.get(lcsIdx).setText( String.valueOf(lcs.charAt(lcsIdx))); lcsIdx--;
+
+            }
+
+            if(curReconStr1Node.get(curAnimationIdx) != null){
+                for(ItemNode x : string1Nodes) x.setNodeColor(Color.WHITE);
+                curReconStr1Node.get(curAnimationIdx).setNodeColor(Color.WHEAT);
+            }
+            if(curReconStr2Node.get(curAnimationIdx) != null) {
+                for(ItemNode x : string2Nodes) x.setNodeColor(Color.WHITE);
+                curReconStr2Node.get(curAnimationIdx).setNodeColor(Color.WHEAT);    
+            }
+        });
+        pause.play();
     }
 
     private void drawTable() {
@@ -293,21 +348,33 @@ public class LCS extends DSAbstract<ItemNode> {
                 }
             }
         }
-        List<ItemNode> curReconNode = new ArrayList<>();
 
-        int i = n, j = m; curReconNode.add(table.get(i-1).get(j-1));
-        while(i > 0 && j > 0) {
+        lcs = new String();
+        int i = n, j = m; 
+        while(i > 0 && j > 0) { 
+            curReconNode.add(table.get(i).get(j));
             if(input1.charAt(i-1) == input2.charAt(j-1)) {
-                
-
+                lcs = input1.charAt(i-1)+ lcs;    
+                System.out.println(lcs);
                 i--; j--; 
+                if(i >= 0) curReconStr1Node.add(string1Nodes.get(i));
+                else curReconStr1Node.add(null);
+                curReconStr2Node.add((j >= 0 ? string2Nodes.get(j) : null));
+                curReconPrev1Node.add(null);
+                curReconPrev2Node.add(null);
             }
             else {
+                curReconPrev1Node.add(table.get(i-1).get(j));
+                curReconPrev2Node.add(table.get(i).get(j-1));
                 if(dp[i-1][j] > dp[i][j-1]) {
                     i--;
+                    curReconStr1Node.add((i >= 0 ? string1Nodes.get(i) : null));
+                    curReconStr2Node.add(null);
                 }
                 else {
                     j--;
+                    curReconStr2Node.add((j >= 0 ? string2Nodes.get(j) : null));
+                    curReconStr1Node.add(null);
                 }
             }
         }
