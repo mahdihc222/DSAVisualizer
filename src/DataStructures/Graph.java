@@ -78,6 +78,7 @@ public class Graph extends DSAbstract<ItemNode> {
     public Graph() {
         selectionGroup = new ToggleGroup();
         initializeControls();
+        showCode();
         //VisualPage.getCodeBox().setText(getCode());
         VisualPage.getControlBox().getChildren().addAll(Controls);
         // VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
@@ -98,26 +99,17 @@ public class Graph extends DSAbstract<ItemNode> {
         VisualPage.getAnimationPane().getChildren().addAll(labels);
     }
 
-    // public Graph(boolean isDirected) {
-    //     selectionGroup = new ToggleGroup();
-    //     initializeControls();
-    //     VisualPage.getCodeBox().setText(getCode());
-    //     VisualPage.getControlBox().getChildren().addAll(Controls);
-    //     VisualPage.getAnimationPane().getChildren().addAll(dataNodes);
-    //     VisualPage.getAnimationPane().getChildren().addAll(dfsCallStack);
-
-    // }
-
 
     @Override
     protected void showCode(){
         Tab dfsTab = new Tab("DFS");
         Tab bfsTab = new Tab("BFS");
 
-        //dfsTab.setContent(getCodeTextArea("DFS"));
-        //call getCodeTextArea with appropriate titles
-       // VisualPage.getCodePane().getTabs().add(dfsTab);
-        //VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
+        dfsTab.setContent(getCodeTextArea("DFS"));
+       VisualPage.getCodePane().getTabs().add(dfsTab);
+       bfsTab.setContent(getCodeTextArea("BFS"));
+       VisualPage.getCodePane().getTabs().add(bfsTab);
+        VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
 
     }
 
