@@ -106,7 +106,12 @@ public class HomePageUp {
         // imgView.fitWidthProperty().bind(vbox.widthProperty());
         // imgView.fitHeightProperty().bind(vbox.heightProperty());
         vbox.getChildren().add(imgView);
-        Label lb = new Label(topicName);
+
+        Label lb;
+        if(topicName.equals("Knapsack")) lb = new Label("0-1 Knapsack");
+        else lb = new Label(topicName);
+
+        
         lb.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         lb.setAlignment(Pos.CENTER);
         vbox.getChildren().add(lb);
