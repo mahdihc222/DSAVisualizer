@@ -157,6 +157,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 isDirected = false;
                 dataNodes.clear();
                 edges.clear();
+                adj.clear();
                 VisualPage.getAnimationPane().getChildren().clear();
                 nodeCount = 0;
             }
@@ -167,6 +168,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 isDirected = true;
                 dataNodes.clear();
                 edges.clear();
+                adj.clear();
                 VisualPage.getAnimationPane().getChildren().clear();
                 nodeCount = 0;
             }
@@ -659,11 +661,12 @@ public class Graph extends DSAbstract<ItemNode> {
         }
 
         edges.add(new Edge(n1, n2, isDirected, true));
-        refresh();
+        
 
         adj.get(n1).add(n2);
         if (!isDirected)
             adj.get(n2).add(n1);
+        refresh();
         return true;
     }
 

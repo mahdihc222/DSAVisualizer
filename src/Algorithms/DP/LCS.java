@@ -257,7 +257,7 @@ public class LCS extends DSAbstract<ItemNode> {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.playFromStart();
     }
-
+    
     void playCurReconIdx() {
         
         if(curAnimationIdx >= 0) {
