@@ -1,18 +1,48 @@
-## Getting Started
+# 📊 DSA Visualizer
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+**DSA Visualizer** is a JavaFX-based educational tool that helps you **visualize and understand core Data Structures and Algorithms** through interactive and animated visual representations.
 
-## Folder Structure
+Whether you're a student, an educator, or someone preparing for coding interviews, this project is designed to make the learning process of DSA more intuitive and engaging.
 
-The workspace contains two folders by default, where:
+---
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+##  Features
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+### Visualized Data Structures:
+- **Graph** (DFS, BFS traversal, and connectivity)
+- **Stacks**
+- **Queues**
+- **Abstract Lists**
+- **Binary Search Trees** (Insert, Delete, Search, Tree Traversal, Height)
+- **Heaps** (Min/Max Heap with animation of insertion and heapify)
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+### Sorting Algorithms:
+- **Bubble Sort**
+- **Selection Sort**
+- **Insertion Sort**
+- **Merge Sort**
+- **Quick Sort**
+> _(All sorting algorithms are animated step-by-step with color-coded comparisons and swaps)_
 
-## Dependency Management
+### Dynamic Programming Visualizations:
+- **Longest Common Subsequence (LCS)**
+- **Sequence Alignment**
+- **0/1 Knapsack**
+> _(These include grid-based matrix visualizations)_
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+---
+
+## Built With
+
+- **Java 17+**
+- **JavaFX 21+**
+- IDE: Visual Studio Code
+
+---
+
+## Usage
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/dsa-visualizer.git
+   cd dsa-visualizer

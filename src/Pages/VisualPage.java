@@ -14,7 +14,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -48,7 +47,6 @@ public class VisualPage {
         root = new StackPane();
         root.setPadding(new Insets(10));
         rootPane = new BorderPane();
-        // VBox.setMargin(rootPane, new Insets(15, 15, 15, 15));
 
         headingLabel = new Label("//Heading");
         headingLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -182,9 +180,5 @@ public class VisualPage {
     public static TabPane getCodePane() {
         return codePane;
     }
-
-    // public static TextArea getCodeBox() {
-    // return codeBox;
-    // }
 
 }

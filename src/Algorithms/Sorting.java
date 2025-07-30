@@ -34,8 +34,6 @@ public class Sorting extends DSAbstract<ItemNode> {
     private final int NODEWIDTH = 40;
     private int currentIndex;
     private int arrayX, arrayY;
-    private final double DOWN_OFFSET = NODEWIDTH * 0.8;
-
     public Sorting() {
         super();
         arrayX = lastX = 50;
@@ -52,7 +50,6 @@ public class Sorting extends DSAbstract<ItemNode> {
         TextField pushField = new TextField();
         pushField.setPromptText("Enter value");
         Button pushButton = new Button("Insert");
-        // standardizeButton(pushButton);
         HBox pushRow = new HBox(20, pushField, pushButton);
         pushButton.setOnAction(e -> {
             insert(pushField);
@@ -65,7 +62,6 @@ public class Sorting extends DSAbstract<ItemNode> {
         TextField removeField = new TextField();
         removeField.setPromptText("Enter value");
         Button removeButton = new Button("Remove");
-        // standardizeButton(removeButton);
         removeButton.setOnAction(e -> {
             delete(removeField);
         });
@@ -180,7 +176,6 @@ public class Sorting extends DSAbstract<ItemNode> {
                 break;
             }
         }
-        // dataNodes.get(i).flash(Color.RED);
         final int INDEXTOREMOVE = i;
         dataNodes.remove(INDEXTOREMOVE);
 
@@ -205,12 +200,12 @@ public class Sorting extends DSAbstract<ItemNode> {
         }
     }
 
-    /** Animates two ItemNodes swapping places: down → sideways → up. */
+    
     private SequentialTransition animateSwap(ItemNode left, ItemNode right, int diff) {
-        double downOffset = NODEWIDTH * 0.8; // how far down
-        double dx = (NODEWIDTH + 10) * diff; // horizontal distance
+        double downOffset = NODEWIDTH * 0.8;
+        double dx = (NODEWIDTH + 10) * diff; 
 
-        // --- LEFT BLOCK ---
+        
         TranslateTransition leftDown = new TranslateTransition(Duration.millis(200), left);
         leftDown.setByY(downOffset);
 
@@ -222,7 +217,7 @@ public class Sorting extends DSAbstract<ItemNode> {
 
         SequentialTransition leftSeq = new SequentialTransition(leftDown, leftSide, leftUp);
 
-        // --- RIGHT BLOCK ---
+        
         TranslateTransition rightDown = new TranslateTransition(Duration.millis(200), right);
         rightDown.setByY(downOffset);
 
@@ -234,25 +229,25 @@ public class Sorting extends DSAbstract<ItemNode> {
 
         SequentialTransition rightSeq = new SequentialTransition(rightDown, rightSide, rightUp);
 
-        // run both sides in parallel
+        
         ParallelTransition swapAnim = new ParallelTransition(leftSeq, rightSeq);
 
-        // when finished: restore layoutX/Y & clear translate offsets
+        
         swapAnim.setOnFinished(e -> {
-            // reset translation deltas
+            
             left.setTranslateX(0);
             left.setTranslateY(0);
             right.setTranslateX(0);
             right.setTranslateY(0);
 
-            // swap logical positions
+            
             double lx = left.getX(), rx = right.getX();
             left.setLocation(rx, left.getY());
             right.setLocation(lx, right.getY());
         });
 
         return new SequentialTransition(
-                new PauseTransition(Duration.millis(50)), // tiny gap before swap
+                new PauseTransition(Duration.millis(50)), 
                 swapAnim);
     }
 
@@ -292,19 +287,19 @@ public class Sorting extends DSAbstract<ItemNode> {
             for (int j = 0; j < n - i - 1; j++) {
                 final int idx = j;
 
-                // colour nodes being compared
+               
                 ItemNode A = dataNodes.get(idx);
                 ItemNode B = dataNodes.get(idx + 1);
 
-                wholeSort.getChildren().add(animateColorChangePair(A, B, Color.ORANGE)); // highlight compare
+                wholeSort.getChildren().add(animateColorChangePair(A, B, Color.ORANGE)); 
 
                 if (A.getElement() > B.getElement()) {
                     swappedAny = true;
 
-                    // visual swap
+                    
                     wholeSort.getChildren().add(animateSwap(A, B, 1));
 
-                    // swap in list
+                   
 
                     Collections.swap(dataNodes, idx, idx + 1);
                     PauseTransition pause = new PauseTransition(Duration.seconds(0.01));
@@ -315,17 +310,17 @@ public class Sorting extends DSAbstract<ItemNode> {
                     wholeSort.getChildren().add(pause);
                 }
 
-                // reset colour
+                
                 wholeSort.getChildren().add(animateColorChangePair(A, B, Color.LIGHTBLUE));
                 wholeSort.getChildren().add(moveLabel(jLabel, NODEWIDTH + 10, 1));
             }
 
-            // mark last sorted
+           
             ItemNode sorted = dataNodes.get(n - i - 1);
             wholeSort.getChildren().add(animateColorChange(sorted, Color.LIMEGREEN));
 
             if (!swappedAny)
-                break; // list already sorted
+                break; 
         }
         PauseTransition labelRemover = new PauseTransition(Duration.seconds(0.01));
         labelRemover.setOnFinished(e -> {
@@ -333,7 +328,7 @@ public class Sorting extends DSAbstract<ItemNode> {
             VisualPage.getAnimationPane().getChildren().remove(jLabel);
         });
         wholeSort.getChildren().add(labelRemover);
-        // remaining elements sorted at end
+       
         for (int k = n - i - 1; k >= 0; k--) {
             wholeSort.getChildren().add(animateColorChange(dataNodes.get(k), Color.LIMEGREEN));
         }
@@ -343,7 +338,7 @@ public class Sorting extends DSAbstract<ItemNode> {
         wholeSort.play();
     }
 
-    /* ---------- small helpers ---------- */
+    
 
     private PauseTransition animateColorChangePair(ItemNode n1, ItemNode n2, Color color) {
         PauseTransition pause = new PauseTransition(Duration.seconds(0.3));
