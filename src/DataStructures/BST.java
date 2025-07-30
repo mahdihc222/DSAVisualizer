@@ -3,8 +3,6 @@ package DataStructures;
 import java.util.LinkedHashMap;
 
 import java.util.Random;
-import java.util.function.Consumer;
-
 import javax.swing.JOptionPane;
 import Helpers.ItemNode;
 import Pages.VisualPage;
@@ -163,14 +161,20 @@ public class BST extends DSAbstract<ItemNode> {
     }
 
     private void findHeight() {
-        Label heightLabel = new Label("Height: " + 0);
+        Label heightLabel = new Label("Height: ");
         heightLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: black; -fx-font-name: Arial;");
-        heightLabel.setLayoutX(VisualPage.getAnimationPane().getLayoutX() + 20);
+        heightLabel.setLayoutX(40);
         heightLabel.setLayoutY(VisualPage.getAnimationPane().getHeight() - 100);
         VisualPage.getAnimationPane().getChildren().add(heightLabel);
-        showHeight(root, heightLabel, height -> {
-            heightLabel.setText("Height: " + height);
+        int[] height = {0};
+        SequentialTransition sq = new SequentialTransition();
+        sq.getChildren().add(showHeight(root, 1, height, heightLabel));
+        PauseTransition pr = new PauseTransition(Duration.seconds(1));
+        pr.setOnFinished(e->{
+            VisualPage.getAnimationPane().getChildren().remove(heightLabel);
         });
+        sq.getChildren().add(pr);
+        sq.play();
     }
 
     private void searchValue(TextField searchField) {
@@ -445,42 +449,34 @@ public class BST extends DSAbstract<ItemNode> {
         pr.play();
     }
 
-    private void showHeight(TreeNode node, Label heightLabel, Consumer<Integer> callback) {
+    private SequentialTransition showHeight(TreeNode node, int lvl, int[] height,Label heightLabel){
+        SequentialTransition sq = new SequentialTransition();
         if (node == null) {
-            callback.accept(0);
-            return;
+            return sq;
         }
-
-        map.get(node).setNodeColor(Color.web("#a5b6d9")); // darken current
-
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(e -> {
-
-            showHeight(node.left, heightLabel, leftHeight -> {
-
-                PauseTransition pauseRight = new PauseTransition(Duration.seconds(1));
-                pauseRight.setOnFinished(e2 -> {
-
-                    // recurse right
-                    showHeight(node.right, heightLabel, rightHeight -> {
-
-                        int currentHeight = Math.max(leftHeight, rightHeight) + 1;
-
-                        heightLabel.setText("Height: " + currentHeight);
-                        map.get(node).setNodeColor(Color.WHITE); // reset color
-
-                        PauseTransition update = new PauseTransition(Duration.seconds(1));
-                        update.setOnFinished(e3 -> {
-                            callback.accept(currentHeight); // return value to parent
-                        });
-                        update.play();
-                    });
-
-                });
-                pauseRight.play();
-            });
+        PauseTransition pr1 = new PauseTransition(Duration.millis(400));
+        pr1.setOnFinished(e->{
+            map.get(node).setNodeColor(Color.ORANGE);
         });
-        pause.play();
+        sq.getChildren().add(pr1);
+        PauseTransition pr2 = new PauseTransition(Duration.millis(100));
+        if(lvl>height[0]) height[0]=lvl;
+        final int hh = height[0];
+        pr2.setOnFinished(e->{
+            heightLabel.setText("Height: " + hh);
+        });
+        sq.getChildren().add(pr2);
+        
+        if(node.left!=null) sq.getChildren().add(showHeight(node.left, lvl+1, height, heightLabel));
+        if(node.right!=null) sq.getChildren().add(showHeight(node.right, lvl+1, height, heightLabel));
+
+        PauseTransition pr3 = new PauseTransition(Duration.millis(400));
+        pr3.setOnFinished(e->{
+            if(map.get(node)!=null) map.get(node).setNodeColor(Color.WHITE);
+        });
+
+        sq.getChildren().add(pr3);
+        return sq;
     }
 
     private void removeNode(int value) {
