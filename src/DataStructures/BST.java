@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import javax.naming.PartialResultException;
 import javax.swing.JOptionPane;
 import Helpers.ItemNode;
 import Pages.VisualPage;
@@ -13,8 +12,6 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
-import javafx.scene.ParallelCamera;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -646,7 +643,6 @@ public class BST extends DSAbstract<ItemNode> {
 
         }
         prt.setOnFinished(e -> {
-            // if (a.left != b && a.right != b)
             VisualPage.getAnimationPane().getChildren().remove(lineMap.get(b));
 
             lineMap.remove(b);
@@ -776,159 +772,6 @@ public class BST extends DSAbstract<ItemNode> {
             fixBST(node.right, lvl + 1);
         }
     }
-
-    private int findLevelNode(TreeNode node) {
-
-        TreeNode curr = root;
-        int count = -1;
-        while (curr != null) {
-            if (curr.element < node.element)
-                curr = curr.right;
-            else
-                curr = curr.left;
-            count++;
-        }
-        return count;
-    }
-
-    // Codes for removing a node fromt BST
-    /*
-     * private void removeNode(int value) {
-     * TreeNode nodeToDelete = findNodeWithValue(value);
-     * if (nodeToDelete == null) {
-     * JOptionPane.showMessageDialog(null, "Node with value " + value +
-     * " not found", "Warning", 1);
-     * return;
-     * }
-     * 
-     * map.get(nodeToDelete).flash(Color.RED);
-     * PauseTransition pr = new PauseTransition(Duration.seconds(1));
-     * pr.setOnFinished(e -> {
-     * treeDelete(nodeToDelete);
-     * });
-     * pr.play();
-     * }
-     * 
-     * private void treeDelete(TreeNode u) {
-     * if (u.left == null) {
-     * transplant(u, u.right);
-     * } else if (u.right == null) {
-     * transplant(u, u.left);
-     * } else {
-     * TreeNode y = treeMinimum(u.right);
-     * if (findParentNode(y) != u) {
-     * animateTransplantPreview(y, y.right, () -> {
-     * transplant(y, y.right);
-     * y.right = u.right;
-     * animateTransplantPreview(u, y, () -> {
-     * transplant(u, y);
-     * y.left = u.left;
-     * deleteNodeDirectly(u);
-     * repositionTree();
-     * });
-     * });
-     * } else {
-     * animateTransplantPreview(u, y, () -> {
-     * transplant(u, y);
-     * y.left = u.left;
-     * deleteNodeDirectly(u);
-     * repositionTree();
-     * });
-     * }
-     * }
-     * }
-     * 
-     * private TreeNode treeMinimum(TreeNode node) {
-     * while (node.left != null) {
-     * node = node.left;
-     * }
-     * return node;
-     * }
-     * 
-     * private void transplant(TreeNode u, TreeNode v) {
-     * TreeNode parent = findParentNode(u);
-     * if (parent == null) {
-     * root = v;
-     * } else if (u == parent.left) {
-     * parent.left = v;
-     * } else {
-     * parent.right = v;
-     * }
-     * 
-     * if (u.left == null && u.right == null) {
-     * deleteNodeDirectly(u);
-     * repositionTree();
-     * } else if (u.left == null || u.right == null) {
-     * deleteNodeDirectly(u);
-     * repositionTree();
-     * }
-     * }
-     * 
-     * private void animateTransplantPreview(TreeNode u, TreeNode v, Runnable
-     * callback) {
-     * if (v != null) {
-     * ItemNode replacementItem = new
-     * ItemNode(v.element,(int)(VisualPage.getAnimationPane().getWidth() - 100), 50,
-     * false, null);
-     * replacementItem.setLayoutX(VisualPage.getAnimationPane().getWidth() - 100);
-     * replacementItem.setLayoutY(50);
-     * replacementItem.flash(Color.YELLOW);
-     * 
-     * VisualPage.getAnimationPane().getChildren().add(replacementItem);
-     * dataNodes.add(replacementItem);
-     * 
-     * PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
-     * pause.setOnFinished(e -> {
-     * VisualPage.getAnimationPane().getChildren().remove(replacementItem);
-     * dataNodes.remove(replacementItem);
-     * callback.run();
-     * });
-     * pause.play();
-     * } else {
-     * callback.run();
-     * }
-     * }
-     * 
-     * private void deleteNodeDirectly(TreeNode nodeToDelete) {
-     * ItemNode itemToDelete = map.get(nodeToDelete);
-     * dataNodes.remove(itemToDelete);
-     * VisualPage.getAnimationPane().getChildren().remove(itemToDelete);
-     * map.remove(nodeToDelete);
-     * }
-     * 
-     * private void repositionTree() {
-     * if (root != null) {
-     * assignPositions(root, VisualPage.getAnimationPane().getWidth() / 2, 50,
-     * VisualPage.getAnimationPane().getWidth() / 4);
-     * updateVisualPositions();
-     * }
-     * }
-     * 
-     * private void assignPositions(TreeNode node, double x, double y, double
-     * offset) {
-     * if (node == null)
-     * return;
-     * 
-     * node.x = (int) x;
-     * node.y = (int) y;
-     * 
-     * if (node.left != null) {
-     * assignPositions(node.left, x - offset, y + 80, offset / 2);
-     * }
-     * if (node.right != null) {
-     * assignPositions(node.right, x + offset, y + 80, offset / 2);
-     * }
-     * }
-     * 
-     * private void updateVisualPositions() {
-     * for (TreeNode node : map.keySet()) {
-     * ItemNode item = map.get(node);
-     * item.setLayoutX(node.x);
-     * item.setLayoutY(node.y);
-     * }
-     * }
-     */
-
     @Override
     protected void removeLastNode() {
         // This function needs no implementation for BST

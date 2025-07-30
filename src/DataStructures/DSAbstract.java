@@ -17,9 +17,6 @@ abstract public class DSAbstract<T> {
     protected int startingX, startingY;
 
     abstract protected void showCode();
-
-    // abstract public List<T> getAnimationNodes();
-    // abstract public List<Node> getControlNodes();
     abstract protected void initializeControls();
 
     abstract protected void addNode(int val);
@@ -33,7 +30,7 @@ abstract public class DSAbstract<T> {
 
     }
 
-    protected TextArea getCodeTextArea(String title){
+    final protected TextArea getCodeTextArea(String title){
         String code = "Code not found";
         try{
             code = Files.readString(Path.of("src/code/"+title+".txt"));

@@ -1,11 +1,7 @@
 package DataStructures;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import Helpers.ItemNode;
 import Pages.VisualPage;
-import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
@@ -14,8 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.util.Duration;
-import javafx.util.Pair;
 
 public class MyList extends DSAbstract<ItemNode> {
 
@@ -23,23 +17,14 @@ public class MyList extends DSAbstract<ItemNode> {
     private final int NODEWIDTH=40;
     private int currentIndex;
     private int startingX;
-    private int sllY;
-    private int dllY;
-    private int offsetY;
     private Line currentIndexIndicator;
     private final int INDICATORHEIGHT = 50;
-    private List<Pair<ItemNode,Line>> SLLNodes;
-    private List<Pair<ItemNode,Pair<Line,Line>>> DLLNodes;
     
     public MyList(){
         super();
         startingX = lastX = 50;
         currentY = 100;
-        sllY = 400;
-        dllY=700;
         currentIndex = 0;
-        SLLNodes = new ArrayList<>();
-        DLLNodes = new ArrayList<>();
         initializeControls();
         
         VisualPage.getControlBox().getChildren().addAll(Controls);
@@ -93,10 +78,8 @@ public class MyList extends DSAbstract<ItemNode> {
         VBox pushPopBox = new VBox(40,pushRow,popRow);
 
         Button leftArrow = new Button("←"); 
-        // standardizeButton(leftArrow);
-        leftArrow.setOnAction(e->moveIndicatorLeft());  // U+2190
-        Button rightArrow = new Button("→");  // U+2192
-        // standardizeButton(rightArrow);
+        leftArrow.setOnAction(e->moveIndicatorLeft());  
+        Button rightArrow = new Button("→");  
         rightArrow.setOnAction(e->moveIndicatorRight());
         HBox arrowBox = new HBox(5, leftArrow,rightArrow);
         VBox rightSideControlBox = new VBox(10,arrowBox);
@@ -112,7 +95,6 @@ public class MyList extends DSAbstract<ItemNode> {
         Tab linkedListTab = new Tab("Linked List");
         linkedListTab.setContent(getCodeTextArea("LinkedList"));
         VisualPage.getCodePane().getTabs().addAll(arrayListTab, linkedListTab);
-        // Disable closing of tabs
         VisualPage.getCodePane().getTabs().forEach(tab-> tab.setClosable(false));
 
     }
@@ -194,7 +176,6 @@ public class MyList extends DSAbstract<ItemNode> {
                 break;
             }
         }
-        //dataNodes.get(i).flash(Color.RED);
         final int INDEXTOREMOVE = i;
         dataNodes.remove(INDEXTOREMOVE);
         
