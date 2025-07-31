@@ -105,8 +105,9 @@ public class MyList extends DSAbstract<ItemNode> {
         if (!input.isEmpty()) {
             try {
                 int value = Integer.parseInt(input);
-                removeNode(value);
                 removeField.clear(); 
+                removeNode(value);
+                
             } catch (NumberFormatException ex) {
                 return;
             }
@@ -168,6 +169,16 @@ public class MyList extends DSAbstract<ItemNode> {
     }
 
     private void removeNode(int value){
+        boolean find = false;
+        for(int i=0; i<dataNodes.size(); i++){
+            if(dataNodes.get(i).getElement()==value){
+                find = true;
+            }
+        }
+        if(find==false){
+            return;
+        } 
+
         VisualPage.getAnimationPane().getChildren().removeAll(dataNodes);
         int i;
         for(i=0; i<dataNodes.size(); i++){

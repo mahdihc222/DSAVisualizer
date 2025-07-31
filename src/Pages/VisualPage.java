@@ -23,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class VisualPage {
@@ -59,16 +60,16 @@ public class VisualPage {
             Tab selectedTab = codePane.getSelectionModel().getSelectedItem();
             if (selectedTab != null) {
                 // Try to find a TextArea in the tab content
-                if (selectedTab.getContent() instanceof VBox vbox) {
-                    for (Node node : vbox.getChildren()) {
-                        if (node instanceof TextArea area) {
+                if (selectedTab.getContent() instanceof TextArea) {
+                    //for (Node node : vbox.getChildren()) {
+                       // if (node instanceof TextArea area) {
                             Clipboard clipboard = Clipboard.getSystemClipboard();
                             ClipboardContent content = new ClipboardContent();
-                            content.putString(area.getText());
+                            content.putString(((TextArea)selectedTab.getContent()).getText());
                             clipboard.setContent(content);
-                            break;
-                        }
-                    }
+                            //break;
+                        //}
+                    //}
                 }
             }
         });
