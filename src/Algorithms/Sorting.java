@@ -885,12 +885,14 @@ public class Sorting extends DSAbstract<ItemNode> {
         i++;
         if (i != e) {
             sq.getChildren().add(animateSwap(dataNodes.get(i),pivot, e-i));
+            ItemNode node = dataNodes.get(i);
             Collections.swap(dataNodes, i, e);
             PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
             final int idx = i;
+            final int ee = e;
             pause.setOnFinished(e1 -> {
                 pivot.setIndex(idx);
-                dataNodes.get(e).setIndex(e);
+                node.setIndex(e);
             });
             sq.getChildren().add(pause);
         }

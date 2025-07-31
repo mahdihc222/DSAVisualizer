@@ -13,7 +13,7 @@ Whether you're a student, an educator, or someone preparing for coding interview
 - **Stacks**
 - **Queues**
 - **Abstract Lists**
-- **Binary Search Trees** (Insert, Delete, Search, Tree Traversal, Height)
+- **Binary Search Trees** (Insert, Delete, Search, Successor, Predecessor, Height)
 - **Heaps** (Min/Max Heap with animation of insertion and heapify)
 
 ### Sorting Algorithms:
@@ -36,9 +36,12 @@ Whether you're a student, an educator, or someone preparing for coding interview
 
 - **Java 17+**
 - **JavaFX 21+**
-- IDE: Visual Studio Code
+- IDE: Visual Studio Code (No FXML or Scene Builder)
 
 ---
+
+## Code
+- **All Codes and resources are in the src folder**
 
 ## Usage
 
