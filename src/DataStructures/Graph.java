@@ -54,6 +54,8 @@ public class Graph extends DSAbstract<ItemNode> {
     List<ItemNode> isGry = new ArrayList<>();
     Timeline timeline;
     
+    Color activeColor = Color.YELLOW;
+    Color visitedColor = Color.LIMEGREEN;
 
     // dfs related:
     List<ItemNode> dfsOrder = new ArrayList<>();
@@ -254,12 +256,12 @@ public class Graph extends DSAbstract<ItemNode> {
                     if (isGry.contains(n)) { // gray
                         isGry.remove(n);
                         n.setNodeColor(Color.WHITE);
-                        n.setTextColor(Color.BLACK);
+                        // n.setTextColor(visitedColor);
                         StackRemove();
                     } else { // black
                         isGry.add(n);
-                        n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(activeColor);
+                        // n.setTextColor(Color.WHITE);
                         dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
                         stackY -= 40; 
                         highlightCurDfsNode();
@@ -280,16 +282,16 @@ public class Graph extends DSAbstract<ItemNode> {
                     ItemNode n = dfsOrder.get(curDfsIdx);
                     if (!isGry.contains(n)) { // white
                         isGry.add(n);
-                        n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(activeColor);
+                        // n.setTextColor(Color.WHITE);
                         dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
                         stackY -= 40; 
                         highlightCurDfsNode();
                         refresh();
                     } else { // grey
                         isGry.remove(n);
-                        n.setNodeColor(Color.BLACK);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(visitedColor);
+                        // n.setTextColor(Color.WHITE);
                         StackRemove();
                     }
                 }
@@ -356,13 +358,13 @@ public class Graph extends DSAbstract<ItemNode> {
                     if (isGry.contains(n)) {
                         isGry.remove(n);
                         n.setNodeColor(Color.WHITE);
-                        n.setTextColor(Color.BLACK);
+                        // n.setTextColor(visitedColor);
                         bfsQueue.removeLast(); queueX -= 40;
                         refresh();
                     } else { // black
                         isGry.add(n);
-                        n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(activeColor);
+                        // n.setTextColor(Color.WHITE);
                         n.highlight();
                         for(ItemNode node : dataNodes) {
                             if(node.getElement() == bfsQueue.getFirst().getElement()) {
@@ -390,14 +392,14 @@ public class Graph extends DSAbstract<ItemNode> {
                     ItemNode n = bfsOrder.get(curBfsIdx);
                     if (!isGry.contains(n)) { // white
                         isGry.add(n);
-                        n.setNodeColor(Color.GREY);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(activeColor);
+                        // n.setTextColor(Color.WHITE);
                         bfsQueue.add(new ItemNode(n.getElement(), queueX, queueY));
                         queueX += 40; refresh();
                     } else { // grey
                         isGry.remove(n);
-                        n.setNodeColor(Color.BLACK);
-                        n.setTextColor(Color.WHITE);
+                        n.setNodeColor(visitedColor);
+                        // n.setTextColor(Color.WHITE);
                         QueueRemove(); refresh();
                     }
                 }
@@ -430,16 +432,16 @@ public class Graph extends DSAbstract<ItemNode> {
                 ItemNode n = dfsOrder.get(curDfsIdx);
                 if (!isGry.contains(n)) { // white
                     isGry.add(n);
-                    n.setNodeColor(Color.GREY);
-                    n.setTextColor(Color.WHITE);
+                    n.setNodeColor(activeColor);
+                    // n.setTextColor(Color.WHITE);
                     dfsCallStack.add(new ItemNode(n.getElement(), stackX, stackY));
                     stackY -= 40;
                     highlightCurDfsNode();
                     refresh();
                 } else { // grey
                     isGry.remove(n);
-                    n.setNodeColor(Color.BLACK);
-                    n.setTextColor(Color.WHITE);
+                    n.setNodeColor(visitedColor);
+                    // n.setTextColor(Color.WHITE);
                     StackRemove(); 
                 }
             } else {
@@ -447,7 +449,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 dfsStackLabel.setVisible(false);
                 for (ItemNode el : dataNodes) {
                     el.setNodeColor(Color.WHITE);
-                    el.setTextColor(Color.BLACK);
+                    // el.setTextColor(visitedColor);
                 }
                 dfsOrder.clear();
                 isGry.clear();
@@ -471,15 +473,15 @@ public class Graph extends DSAbstract<ItemNode> {
                 ItemNode n = bfsOrder.get(curBfsIdx);
                 if (!isGry.contains(n)) { // white
                     isGry.add(n);
-                    n.setNodeColor(Color.GREY);
-                    n.setTextColor(Color.WHITE);
+                    n.setNodeColor(activeColor);
+                    // n.setTextColor(Color.WHITE);
                     bfsQueue.add(new ItemNode(n.getElement(), queueX, queueY));
                     queueX += 40;
                     refresh();
                 } else { // grey
                     isGry.remove(n);
-                    n.setNodeColor(Color.BLACK);
-                    n.setTextColor(Color.WHITE);
+                    n.setNodeColor(visitedColor);
+                    // n.setTextColor(Color.WHITE);
                     QueueRemove();
                     refresh();
                 }
@@ -488,7 +490,7 @@ public class Graph extends DSAbstract<ItemNode> {
                 bfsQueueLabel.setVisible(false);
                 for (ItemNode el : dataNodes) {
                     el.setNodeColor(Color.WHITE);
-                    el.setTextColor(Color.BLACK);
+                    // el.setTextColor(visitedColor);
                 }
                 bfsOrder.clear();
                 isGry.clear();

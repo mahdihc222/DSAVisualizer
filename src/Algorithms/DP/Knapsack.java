@@ -121,6 +121,7 @@ public class Knapsack extends DSAbstract<ItemNode> {
                     curNode.getLast().setNodeColor(Color.WHITE);
                     prevNodeCase1.getLast().setNodeColor(Color.WHITE);
                     prevNodeCase2.getLast().setNodeColor(Color.WHITE);
+                    VisualPage.getAnimationPane().getChildren().remove(dpText);
                 }
             }));
             timeline.setCycleCount(Animation.INDEFINITE);
