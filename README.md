@@ -36,7 +36,7 @@ Whether you're a student, an educator, or someone preparing for coding interview
 
 - **Java 17+**
 - **JavaFX 21+**
-- IDE: Visual Studio Code
+- IDE: Visual Studio Code (No FXML or Scene Builder)
 
 ---
 
