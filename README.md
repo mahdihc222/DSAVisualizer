@@ -13,7 +13,7 @@ Whether you're a student, an educator, or someone preparing for coding interview
 - **Stacks**
 - **Queues**
 - **Abstract Lists**
-- **Binary Search Trees** (Insert, Delete, Search, Tree Traversal, Height)
+- **Binary Search Trees** (Insert, Delete, Search, Successor, Predecessor, Height)
 - **Heaps** (Min/Max Heap with animation of insertion and heapify)
 
 ### Sorting Algorithms:
