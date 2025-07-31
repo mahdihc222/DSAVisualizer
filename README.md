@@ -40,6 +40,9 @@ Whether you're a student, an educator, or someone preparing for coding interview
 
 ---
 
+## Code
+- **All Codes and resources are in the src folder**
+
 ## Usage
 
 1. Clone the repository:
