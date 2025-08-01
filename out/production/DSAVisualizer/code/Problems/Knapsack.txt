@@ -1,0 +1,5 @@
+There are n distinct items and a knapsack of capacity W.
+Each item has 2 attributes, weight (w) and value (v) .
+You have to select a subset of items to put into the knapsack such that 
+the total weight does not exceed the capacity  
+and the total value is maximized.

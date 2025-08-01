@@ -1,0 +1,33 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+pair<int, string> LCS(const string& A, const string& B) {
+    int m = A.size(), n = B.size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+    // Fill DP table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            if (A[i - 1] == B[j - 1])
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            else
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+
+    // Reconstruct LCS
+    int i = m, j = n;
+    string lcsStr;
+    while (i > 0 && j > 0) {
+        if (A[i - 1] == B[j - 1]) {
+            lcsStr += A[i - 1];
+            --i; --j;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            --i;
+        } else {
+            --j;
+        }
+    }
+    reverse(lcsStr.begin(), lcsStr.end());
+    return {dp[m][n], lcsStr};
+}

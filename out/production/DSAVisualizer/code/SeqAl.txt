@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+pair<int, pair<string, string>> sequenceAlignment(const string& A, const string& B,
+    const int MATCH, const int MISMATCH, const int GAP) {
+    int m = A.size(), n = B.size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+    // Initialize base cases (gaps only)
+    for (int i = 1; i <= m; ++i) dp[i][0] = i * GAP;
+    for (int j = 1; j <= n; ++j) dp[0][j] = j * GAP;
+
+    // Fill DP table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            int scoreMatch = (A[i - 1] == B[j - 1]) ? MATCH : MISMATCH;
+            dp[i][j] = max({
+                dp[i - 1][j - 1] + scoreMatch, // match/mismatch
+                dp[i - 1][j] + GAP,            // gap in B
+                dp[i][j - 1] + GAP             // gap in A
+            });
+        }
+    }
+
+    // Reconstruct aligned sequences
+    string alignedA, alignedB;
+    int i = m, j = n;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0) {
+            int scoreMatch = (A[i - 1] == B[j - 1]) ? MATCH : MISMATCH;
+            if (dp[i][j] == dp[i - 1][j - 1] + scoreMatch) {
+                alignedA += A[i - 1];
+                alignedB += B[j - 1];
+                --i; --j;
+                continue;
+            }
+        }
+        if (i > 0 && dp[i][j] == dp[i - 1][j] + GAP) {
+            alignedA += A[i - 1];
+            alignedB += '-';
+            --i;
+        } else {
+            alignedA += '-';
+            alignedB += B[j - 1];
+            --j;
+        }
+    }
+
+    reverse(alignedA.begin(), alignedA.end());
+    reverse(alignedB.begin(), alignedB.end());
+
+    return {dp[m][n], {alignedA, alignedB}};
+}

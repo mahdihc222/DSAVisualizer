@@ -1,0 +1,5 @@
+Given two sequences (strings), the Sequence Alignment problem asks to align them by possibly inserting gaps (-) so that the resulting aligned sequences have the same length and the overall alignment value is maximized. 
+At each position in the aligned sequences, if the characters match, a match score is added;
+if the characters differ, a mismatch penalty is incurred;
+and if a character is aligned with a gap, a gap penalty is applied.
+The goal is to determine an optimal alignment that maximizes the total value /minimizes the total cost.

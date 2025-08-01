@@ -1,0 +1,310 @@
+#include "BST.hpp"
+#include <iostream>
+#include <stdexcept>
+
+/**
+ * Binary Search Tree implementation using linked list structure
+ * 
+ * @tparam Key - The type of keys stored in the BST
+ * @tparam Value - The type of values associated with keys
+ */
+template <typename Key, typename Value>
+class ListBST : public BST<Key, Value> {
+private:
+    /**
+     * Node class for the binary search tree
+     */
+    class Node {
+    public:
+        Key key;
+        Value value;
+        Node* left;
+        Node* right;
+        
+        Node(Key k, Value v) : key(k), value(v), left(nullptr), right(nullptr) {}
+    };
+    
+    Node* root;
+    size_t node_count;
+    
+    // TODO: Implement private helper functions as needed
+    // Start your private helper functions here
+    void freeBST(Node* root){
+        if(root==nullptr) return;
+        freeBST(root->left);
+        freeBST(root->right);
+        delete root;
+    }
+
+    Node* findParent(Node *node) const{
+        if(node==root||root == nullptr) return nullptr;
+        Node* curr = root;
+        while(curr){
+            if(curr->left==node || curr->right == node) return curr;
+            if(node->key<curr->key) curr=curr->left;
+            else curr = curr->right;
+        }
+        return nullptr;
+    }
+
+    void transplant(Node *u, Node* v){
+        Node *up = findParent(u);
+        if(up==nullptr){
+            root = v;
+            return;
+        }
+        else if(up->left == u){
+            up->left =v;
+        }
+        else {
+            up->right = v;
+        }
+    }
+
+    Node* minNode(Node *root) const{
+        if(root==nullptr) return root;
+        while(root->left) root = root->left;
+        return root;
+    }
+
+    Node* findNodeWKey(Key key) const{
+        Node* curr=root;
+        while(curr){
+            if(curr->key==key) break;
+            else if(key<curr->key) curr = curr->left;
+            else curr = curr->right;
+        }
+        return curr;
+    }
+
+    size_t size_tree(Node* root) const{
+        if(root==nullptr) return 0;
+        return size_tree(root->left)+size_tree(root->right)+1;
+    }
+
+    void traverse_default(Node *root) const{
+        if(root==nullptr){
+             std::cout<<" ()";
+             return;
+        }
+        std::cout<<" ("<< root->key<<":"<<root->value;
+        if(root->right){
+            traverse_default(root->left);
+            traverse_default(root->right);
+        }
+        else if(root->left){
+            traverse_default(root->left);
+        }
+        
+        std::cout<<")";
+    }
+    
+    void traverse_pre(Node *root) const{
+        if(root==nullptr) return;
+        std::cout<<" ("<< root->key<<":"<<root->value<<")";
+        traverse_pre(root->left);
+        traverse_pre(root->right);
+    }
+
+    void traverse_in(Node *root) const{
+        if(root==nullptr) return;
+        traverse_in(root->left);
+        std::cout<<" ("<< root->key<<":"<<root->value<<")";
+        traverse_in(root->right);
+    }
+
+    void traverse_post(Node *root) const{
+        if(root==nullptr) return;
+        traverse_post(root->left);
+        traverse_post(root->right);
+        std::cout<<" ("<< root->key<<":"<<root->value<<")";
+    }
+    // End your private helper functions here
+
+public:
+    /**
+     * Constructor
+     */
+    ListBST() : root(nullptr), node_count(0) {}
+    
+    /**
+     * Destructor
+     */
+    ~ListBST() {
+        // TODO: Implement destructor to free memory
+        freeBST(root);
+    }
+    /**
+     * Insert a key-value pair into the BST
+     */
+    bool insert(Key key, Value value) override {
+        // TODO: Implement insertion logic
+        Node *newItem = new(std::nothrow) Node(key,value);
+        if(newItem==nullptr){
+                std::cout<<"Allocation failed.";
+                exit(-1);
+            }
+        if(root==nullptr){
+            root = newItem;
+            return true;
+        }
+        Node *curr = root;
+        Node *par = nullptr;
+        
+        while(curr){
+            if(curr->key==key) return false;
+            par = curr;
+            if(curr->key<key){
+                curr = curr->right;
+            }
+            else{
+                curr = curr->left;
+            }
+        }
+
+        if(key<par->key){
+            par->left = newItem;
+        }
+        else{
+            par->right = newItem;
+        }
+        return true;
+    }
+    
+    /**
+     * Remove a key-value pair from the BST
+     */
+    bool remove(Key key) override {
+        // TODO: Implement removal logic
+        Node* curr = root;
+     
+        bool found=false;
+        while(curr){
+            if(curr->key==key){
+                found = true;
+                break;
+            }
+            if(key<curr->key) curr = curr->left;
+            else curr = curr->right;
+            
+        }
+        if(!found) return false;
+
+        if(curr->left==nullptr) transplant(curr,curr->right);
+        else if(curr->right == nullptr) transplant(curr, curr->left);
+        else {
+            Node *rightMin = minNode(curr->right);
+            if(curr->right!=rightMin){
+                transplant(rightMin,rightMin->right);
+                rightMin->right = curr->right;
+            }
+            transplant(curr,rightMin);
+            rightMin->left = curr->left;
+        }
+        delete curr;
+    
+        return true;
+    }
+    
+    /**
+     * Find if a key exists in the BST
+     */
+    bool find(Key key) const override {
+        // TODO: Implement find logic
+        return findNodeWKey(key)!=nullptr;
+    }
+
+    /**
+     * Find a value associated with a given key
+     */
+    Value get(Key key) const override {
+        // TODO: Implement get logic
+        Node *curr = findNodeWKey(key);
+        if(curr==nullptr) throw std::runtime_error("Key not found");
+        return curr->value;
+    }
+
+    /**
+     * Update the value associated with a given key
+     */
+    void update(Key key, Value value) override {
+        // TODO: Implement update logic
+        Node *curr = findNodeWKey(key);
+        curr->value = value;
+    }
+
+    /**
+     * Clear all elements from the BST
+     */
+    void clear() override {
+        // TODO: Implement clear logic
+        freeBST(root);
+    }
+    
+    /**
+     * Get the number of keys in the BST
+     */
+    size_t size() const override {
+        // TODO: Implement size logic
+        return size_tree(root);
+    }
+    
+    /**
+     * Check if the BST is empty
+     */
+    bool empty() const override {
+        // TODO: Implement empty check logic
+        return root==nullptr;
+    }
+    
+    /**
+     * Find the minimum key in the BST
+     */
+    Key find_min() const override {
+        // TODO: Implement find_min logic
+        Node* minNode = root;
+        while(minNode -> left !=nullptr){
+            minNode = minNode->left;
+        }
+        return minNode->key;
+    }
+    
+    /**
+     * Find the maximum key in the BST
+     */
+    Key find_max() const override {
+        // TODO: Implement find_max logic
+        Node* maxNode=root;
+        while(maxNode->right!=nullptr){
+            maxNode = maxNode->right;
+        }
+        return maxNode->key;
+    }
+
+    void print(char traversal_type = 'D') const override {
+        // TODO: Implement print logic
+        switch (traversal_type)
+        {
+        case 'D':
+        case 'd':
+            traverse_default(root);
+            break;
+        case 'I':
+        case 'i':
+            traverse_in(root);
+            break;
+        case 'P':
+        case 'p':
+            traverse_pre(root);
+            break;
+        case 'o':
+        case 'O':
+            traverse_post(root);
+            break;
+        default:
+            traverse_default(root);
+            break;
+        }
+    }
+    
+};

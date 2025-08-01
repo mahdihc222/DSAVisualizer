@@ -1,0 +1,167 @@
+#include <iostream>
+#include <cstdlib> // for exit()
+
+class ArrayList {
+private:
+    int* array;
+    int maxSize;    // Maximum capacity
+    int currentPos; // Current position
+    int currentSize; // Current number of elements
+
+    void increaseCapacity() {
+        std::cout << "Capacity increased from " << maxSize << " to " << maxSize * 2 << std::endl;
+        int* newArr = new int[maxSize * 2](); // Initialize with zeros
+        for (int i = 0; i < maxSize; i++) {
+            newArr[i] = array[i];
+        }
+        delete[] array;
+        array = newArr;
+        maxSize *= 2;
+    }
+
+    void decreaseCapacity() {
+        std::cout << "Capacity decreased from " << maxSize << " to " << maxSize / 2 << std::endl;
+        int* newArr = new int[maxSize / 2](); // Initialize with zeros
+        for (int i = 0; i < maxSize / 2; i++) {
+            newArr[i] = array[i];
+        }
+        delete[] array;
+        array = newArr;
+        maxSize /= 2;
+    }
+
+    void rightShiftArray(int index) {
+        for (int i = currentSize; i > index; i--) {
+            array[i] = array[i - 1];
+        }
+    }
+
+    void leftShiftArray(int index) {
+        for (int i = index; i < currentSize - 1; i++) {
+            array[i] = array[i + 1];
+        }
+    }
+
+public:
+    // Constructor
+    ArrayList() : maxSize(2), currentPos(-1), currentSize(0) {
+        array = new int[maxSize](); // Initialize with zeros
+        if (!array) {
+            std::cerr << "Error allocating memory." << std::endl;
+            exit(-1);
+        }
+    }
+
+    // Destructor
+    ~ArrayList() {
+        delete[] array;
+    }
+
+    void print() const {
+        if (currentSize == 0) {
+            std::cout << "[.]" << std::endl;
+        } else {
+            std::cout << "[ ";
+            for (int i = 0; i < currentSize; i++) {
+                std::cout << array[i];
+                if (i == currentPos) std::cout << "|";
+                std::cout << " ";
+            }
+            std::cout << "]" << std::endl;
+        }
+    }
+
+    void insert(int item) {
+        currentSize++;
+        if (currentSize > maxSize / 2) increaseCapacity();
+
+        if (array[currentPos + 1] != 0) {
+            rightShiftArray(currentPos + 1);
+        }
+        array[currentPos + 1] = item;
+        currentPos++;
+        print();
+    }
+
+    int deleteCurrent() {
+        if (currentPos < 0) {
+            std::cerr << "Can't delete from an empty list." << std::endl;
+            return -3245; // error code
+        }
+        int deleted = array[currentPos];
+
+        leftShiftArray(currentPos);
+        currentSize--;
+        if (currentSize == currentPos) currentPos--;
+        if (currentSize < maxSize / 4 && maxSize >= 2) {
+            decreaseCapacity();
+        }
+        print();
+        return deleted;
+    }
+
+    void append(int item) {
+        if (currentPos == -1) currentPos = 0;
+        currentSize++;
+        if (currentSize > maxSize / 2) increaseCapacity();
+        array[currentSize - 1] = item;
+        print();
+    }
+
+    int size() const {
+        return currentSize;
+    }
+
+    void prev(int n) {
+        if (currentPos - n <= 0) currentPos = 0;
+        else currentPos -= n;
+        print();
+    }
+
+    void next(int n) {
+        if ((currentPos + n) >= (currentSize - 1)) {
+            currentPos = currentSize - 1;
+        } else {
+            currentPos += n;
+        }
+        print();
+    }
+
+    bool isPresent(int item) const {
+        for (int i = 0; i < currentSize; i++) {
+            if (array[i] == item) return true;
+        }
+        return false;
+    }
+
+    void clear() {
+        delete[] array;
+        maxSize = 2;
+        currentPos = -1;
+        currentSize = 0;
+        array = new int[maxSize]();
+        print();
+    }
+
+    void deleteItem(int item) {
+        bool found = false;
+        for (int i = 0; i < currentSize; i++) {
+            if (array[i] == item) {
+                leftShiftArray(i);
+                currentSize--;
+                i--;
+                if (currentSize == currentPos) currentPos--;
+                if (currentSize < maxSize / 4 && maxSize >= 2) {
+                    decreaseCapacity();
+                }
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            print();
+        } else {
+            std::cout << item << " not found" << std::endl;
+        }
+    }
+};

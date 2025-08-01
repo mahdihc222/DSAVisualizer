@@ -1,0 +1,15 @@
+vector<int> adj[N];
+bool visited[N];
+
+void dfs(int node) {
+    visited[node] = true;
+
+    // process node
+
+    for (int neighbor : adj[node]) {
+        if (!visited[neighbor]) {
+            dfs(neighbor);
+        }
+    }
+    
+}

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="DSAVisualizer:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62606894-ef38-4cf1-bfb2-5b6da37196c5" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/src/Main1.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/VisualPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/VisualPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DataStructures/DSAbstract.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DataStructures/DSAbstract.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,12 +44,13 @@
     "Application.Main.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/Mutammim/Desktop/DSAVisualizer",
     "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15",
+    "project.structure.proportion": "0.15703125",
     "project.structure.side.proportion": "0.2"
   }
 }]]></component>

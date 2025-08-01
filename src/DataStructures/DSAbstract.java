@@ -1,4 +1,8 @@
 package DataStructures;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +37,9 @@ abstract public class DSAbstract<T> {
     final protected TextArea getCodeTextArea(String title){
         String code = "Code not found";
         try{
-            code = Files.readString(Path.of("src/code/"+title+".txt"));
+            InputStream in = DSAbstract.class.getResourceAsStream("/code/" + title + ".txt");
+            code = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+
 
         }
         catch(Exception e){
